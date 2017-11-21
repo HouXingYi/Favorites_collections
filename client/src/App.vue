@@ -1,88 +1,37 @@
 <template>
   <div id="app">
-    <div class="header">
-      <img class="headerLogo" src="../static/logo.png" alt="">
-      <div class="leftNav">
-        <ul class="leftNavList">
-          <li class="leftNavItem"><a href="#">首页</a></li>
-          <li class="leftNavItem"><a href="#">热门</a></li>
-        </ul>
-      </div>
-      <div class="userCenter">
-        <div class="userCenterInfo"></div>
-        <ul id="userCenterDropdown">
-          <li><a href=""></a>a</li>
-          <li><a href=""></a>b</li>
-          <li><a href=""></a>c</li>
-        </ul>
-      </div>
-    </div>
-    <div class="leftBar"></div>    
-    <div class="mainContainer">
-      main
-    </div> 
+    <topHeader></topHeader>
+    <leftBar></leftBar>   
+    <mainCon></mainCon>
   </div>
 </template>
-
 <script>
+import topHeader from './components/topHeader.vue'
+import leftBar from './components/leftBar.vue'
+import mainCon from './components/mainCon.vue'
 export default {
-  name: 'app'
+  name: 'app',
+  data(){
+    return {
+    }
+  },
+  created(){
+  },
+  components : {
+    topHeader,
+    leftBar,
+    mainCon
+  }
 }
 </script>
-
 <style lang="scss">
 @import "./style/index";
-
 #app{
   .header{
-    height: 60px;
-    background: #23262E;
-    color: #fff;
-    .headerLogo{
-      width: 150px;
-      height: 50px;
-      margin-left: 20px;
-      margin-top: -2px;
-      float: left;
-    }
-    .leftNav{
-      float: left;
-      height: 60px;
-      line-height: 60px;
-      margin-left: 30px;
-      .leftNavList{
-        .leftNavItem{
-          padding: 0 15px;
-          float: left;
-          a{
-            color: #fff;
-          }
-        }
-      }
-    }
-    .userCenter{
-
-      float: right;
-
-    }
   }
   .leftBar{
-    position: fixed;
-    width: 200px;
-    border-right: 1px solid #e5e5e5;
-    background: #123456;
-    top: 60px;
-    left: 0;
-    bottom: 0;
   }
   .mainContainer{
-    position: absolute;
-    background: lightcoral;
-    top: 60px;
-    left: 200px;
-    right: 0;
-    bottom: 0;
   }
 }
-
 </style>
