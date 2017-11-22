@@ -34,16 +34,42 @@
           <li class="ConItem">item10</li>
           <li class="ConItem">item11</li>
           <li class="ConItem">item12</li>
+          <button class="test" @click="getTest1">点击我发送GET请求</button>
+          <button class="test" @click="getTest2">点击我发送POST请求</button>
         </ul>
       </div>
     </div>
   </div>
 </template>
 <script>
+import axios from 'axios'
 export default {
   name: 'mainContainer',
   data () {
     return {
+    }
+  },
+  methods :{
+    getTest1(){
+      axios.get('/test')
+      .then(function (response) {
+        console.log(response);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+    },
+    getTest2(){ // POST请求
+      axios.post('/testPOST', {
+        'firstName': 'houxingyi',
+        'lastName': 'houxingyi2'
+      })
+      .then(function (response) {
+        console.log(response);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
     }
   }
 }
