@@ -1,15 +1,27 @@
 var express = require('express');
+var connect = require('connect');
 var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var session = require('express-session');
+var mongoStore = require('connect-mongo')(session);
 var routes = require('./routes/index');
 var db = require('./mongodb/db.js');
 var app = express();
+var dburl = 'mongodb://127.0.0.1:27017/favorites';
 
 //连接数据库
 db();
+//sessions//connect-mongo
+app.use(session({
+  secret: 'imooc',
+  store: new mongoStore({
+    url: dburl,
+    collection: 'sessions'
+  })
+}))
 //静态
 app.use(logger('dev'));
 app.use(bodyParser.json());

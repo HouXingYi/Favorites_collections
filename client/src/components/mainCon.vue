@@ -28,49 +28,113 @@
           <li class="ConItem">item4</li>
           <li class="ConItem">item5</li>
           <li class="ConItem">item6</li>
-          <li class="ConItem">item7</li>
-          <li class="ConItem">item8</li>
-          <li class="ConItem">item9</li>
-          <li class="ConItem">item10</li>
-          <li class="ConItem">item11</li>
-          <li class="ConItem">item12</li>
-          <button class="test" @click="getTest1">点击我发送GET请求</button>
-          <button class="test" @click="getTest2">点击我发送POST请求</button>
+          <button class="test" @click="openloginModal">登录</button>
+          <button class="test" @click="openModal">注册</button>
         </ul>
       </div>
     </div>
+    <Modal :isShow="isShow" :size="size" @close="closeModal">
+      <h1>注册</h1>
+      <span>用户名</span>
+      <input type="text" style="display:block;" v-model="userName">
+      <span>密码</span>
+      <input type="text" style="display:block;" v-model="passWord">
+      <button @click="enterSignUp">确定</button>
+    </Modal>
+    <Modal :isShow="isloginShow" :size="size" @close="closeloginModal">
+      <h1>登录</h1>
+      <span>用户名</span>
+      <input type="text" style="display:block;" v-model="userloginName">
+      <span>密码</span>
+      <input type="text" style="display:block;" v-model="loginpassWord">
+      <button @click="enterlogin">确定</button>
+    </Modal>
   </div>
 </template>
 <script>
 import axios from 'axios'
+import Modal from './modal'
 export default {
   name: 'mainContainer',
   data () {
     return {
+      isShow : false,
+      isloginShow : false,
+      size : {
+        height:250,
+        width:550
+      },
+      userName : '',
+      passWord : '',
+      userloginName:'',
+      loginpassWord:''
     }
   },
   methods :{
-    getTest1(){
-      axios.get('/test')
+    //登录
+    enterlogin(){ 
+      var _this = this;
+      let userName = _this.userloginName
+      let passWord = _this.loginpassWord
+      if( userName == '' || passWord == '' ){
+        alert("请输入密码或用户名！");
+        return false
+      }
+      axios.post('/login', {
+        'name': userName,
+        'passWord': passWord
+      })
       .then(function (response) {
-        console.log(response);
+        let data = response.data;
+        console.log(data);
       })
       .catch(function (error) {
         console.log(error);
       });
+
     },
-    getTest2(){ // POST请求
-      axios.post('/testPOST', {
-        'firstName': 'houxingyi',
-        'lastName': 'houxingyi2'
+    openModal(){ 
+      this.isShow = true;
+    },
+    closeModal(){
+      this.isShow = false;
+    },
+    openloginModal(){
+      this.isloginShow = true;
+    },
+    closeloginModal(){
+      this.isloginShow = false;
+    },
+    //注册
+    enterSignUp(){
+      var _this = this;
+      let userName = _this.userName
+      let passWord = _this.passWord
+      if( userName == '' || passWord == '' ){
+        alert("请输入密码或用户名！");
+        return false
+      }
+      
+      axios.post('/signUp', {
+        'name': userName,
+        'passWord': passWord
       })
       .then(function (response) {
-        console.log(response);
+        let data = response.data;
+        if(data.singup == "success"){
+          alert("注册成功!");
+        }else if(data.singup == "repeat"){
+          alert("已有账户!");
+        }
       })
       .catch(function (error) {
         console.log(error);
       });
+
     }
+  },
+  components : {
+    Modal
   }
 }
 </script>
