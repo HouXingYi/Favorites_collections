@@ -3,7 +3,11 @@ const router = express.Router();
 
 var user = require('../controller/user');
 
-router.post('/login', user.login);
-router.post('/signUp', user.signUp);
+// '/server'下所有请求转发过来
+
+router.get('/server/checkLogin', user.checkLogin);
+
+router.post('/server/login', user.login);
+router.post('/server/signUp', user.signUp);
 
 module.exports = router

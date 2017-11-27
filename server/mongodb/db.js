@@ -2,9 +2,9 @@
 var mongoose = require('mongoose');
 
 module.exports = function(){
-    mongoose.connect('mongodb://127.0.0.1:27017/favorites');
+    mongoose.connect('mongodb://127.0.0.1:27017/favorites',{useMongoClient:true});
     const db = mongoose.connection;
-    db.once('open' ,() => {
+    db.once('openUri' ,() => {
         console.log('连接数据库成功')
     })
     db.on('error', function(error) {

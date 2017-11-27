@@ -16,7 +16,9 @@ var dburl = 'mongodb://127.0.0.1:27017/favorites';
 db();
 //sessions//connect-mongo
 app.use(session({
-  secret: 'imooc',
+  resave:false,
+  saveUninitialized:true,
+  secret: 'houxingyi',
   store: new mongoStore({
     url: dburl,
     collection: 'sessions'

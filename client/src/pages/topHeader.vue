@@ -8,7 +8,7 @@
       </ul>
     </div>
     <div class="userCenter">
-      <div class="userCenterInfo">登录</div>
+      <div class="userCenterInfo" >登录</div>
       <ul id="userCenterDropdown">
         <li><a href=""></a></li>
         <li><a href=""></a></li>
@@ -17,13 +17,14 @@
     </div>
   </div>
 </template>
-
 <script>
 export default {
   name: 'topHeader',
   data () {
     return {
     }
+  },
+  methods :{
   }
 }
 </script>

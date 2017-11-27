@@ -1,37 +1,53 @@
 <template>
   <div id="app">
-    <topHeader></topHeader>
-    <leftBar></leftBar>   
-    <mainCon></mainCon>
+    <login v-if="!islogin" @logined="handleLogin"></login>
+    <topHeader v-if="islogin"></topHeader>
+    <leftBar v-if="islogin"></leftBar>   
+    <mainCon v-if="islogin"></mainCon>
   </div>
 </template>
 <script>
-import topHeader from './components/topHeader.vue'
-import leftBar from './components/leftBar.vue'
-import mainCon from './components/mainCon.vue'
+import topHeader from './pages/topHeader.vue'
+import leftBar from './pages/leftBar.vue'
+import mainCon from './pages/mainCon.vue'
+import login from './pages/login.vue'
 export default {
   name: 'app',
   data(){
     return {
+      islogin : false
     }
   },
   created(){
+    let _this = this;
+    this.$ajax.get('/server/checkLogin')
+    .then(function (response) {
+      let data = response.data;
+      let name = data.name;
+      let sta = data.status;
+      if(sta == 0){
+        _this.islogin = false;
+      }else{
+        _this.islogin = true;
+      }
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+  },
+  methods:{
+    handleLogin(){
+      this.islogin = true;
+    }
   },
   components : {
     topHeader,
     leftBar,
-    mainCon
+    mainCon,
+    login
   }
 }
 </script>
 <style lang="scss">
 @import "./style/index";
-#app{
-  .header{
-  }
-  .leftBar{
-  }
-  .mainContainer{
-  }
-}
 </style>
