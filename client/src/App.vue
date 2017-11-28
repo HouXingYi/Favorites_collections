@@ -15,7 +15,7 @@ export default {
   name: 'app',
   data(){
     return {
-      islogin : false,
+      islogin : true,
       userName : ''
     }
   },
@@ -30,9 +30,11 @@ export default {
         if(sta == 0){
           _this.islogin = false;
           _this.userName = '';
+          _this.$store.commit("updateUserInfo","");
         }else if(sta == 1){
           _this.islogin = true;
           _this.userName = name;
+          _this.$store.commit("updateUserInfo",name);
         }
       })
       .catch(function (error) {

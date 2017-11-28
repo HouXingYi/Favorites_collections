@@ -2,6 +2,7 @@
 var mongoose = require('mongoose');
 
 module.exports = function(){
+    mongoose.Promise = global.Promise;  
     mongoose.connect('mongodb://127.0.0.1:27017/favorites',{useMongoClient:true});
     const db = mongoose.connection;
     db.once('openUri' ,() => {
