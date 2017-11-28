@@ -50,6 +50,7 @@ export default {
   left: 200px;
   right: 0;
   bottom: 0;  
+  z-index: -1;
   .ConTopBar{
     height: 50px;
     border-bottom: 1px solid #ddd;

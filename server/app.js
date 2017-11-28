@@ -19,6 +19,7 @@ app.use(session({
   resave:false,
   saveUninitialized:true,
   secret: 'houxingyi',
+  cookie: {maxAge: 7*86400*1000 }, //7天
   store: new mongoStore({
     url: dburl,
     collection: 'sessions'

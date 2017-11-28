@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <login v-if="!islogin" @logined="handleLogin"></login>
-    <topHeader v-if="islogin"></topHeader>
+    <topHeader v-if="islogin" :userName="userName" @logout="handleLogout"></topHeader>
     <leftBar v-if="islogin"></leftBar>   
     <mainCon v-if="islogin"></mainCon>
   </div>
@@ -15,29 +15,37 @@ export default {
   name: 'app',
   data(){
     return {
-      islogin : false
+      islogin : false,
+      userName : ''
     }
   },
-  created(){
+  mounted(){
     let _this = this;
-    this.$ajax.get('/server/checkLogin')
-    .then(function (response) {
-      let data = response.data;
-      let name = data.name;
-      let sta = data.status;
-      if(sta == 0){
-        _this.islogin = false;
-      }else{
-        _this.islogin = true;
-      }
+    _this.$nextTick(function () {
+      _this.$ajax.get('/server/checkLogin')
+      .then(function (response) {
+        let data = response.data;
+        let name = data.name;
+        let sta = data.status;
+        if(sta == 0){
+          _this.islogin = false;
+          _this.userName = '';
+        }else if(sta == 1){
+          _this.islogin = true;
+          _this.userName = name;
+        }
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
     })
-    .catch(function (error) {
-      console.log(error);
-    });
   },
   methods:{
     handleLogin(){
       this.islogin = true;
+    },
+    handleLogout(){
+      this.islogin = false;
     }
   },
   components : {

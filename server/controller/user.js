@@ -4,8 +4,8 @@ class User{
 	constructor(){
 	}
 	checkLogin(req, res, next){
-		var user = req.session.user
-		var name;
+		let user = req.session.user
+		let name;
 		if(!user){
 			res.send({
 				name : "unlogin",
@@ -17,12 +17,18 @@ class User{
 				status : 1
 			})
 		}
-		
+	}
+	//登出
+	logout(req, res, next){
+		delete req.session.user
+		res.send({
+			status : 0 
+		})
 	}
 	//登录
 	login(req, res, next){  
-		var name = req.body.name
-		var passWord = req.body.passWord
+		let name = req.body.name
+		let passWord = req.body.passWord
 		UserModel.findOne({name: name}, function(err, user) {
 			// status : -1  不存在该账户
 			// status : 0  密码错误
@@ -41,7 +47,6 @@ class User{
 				if (err) {
 					console.log(err)
 				}
-		
 				if (isMatch) {
 					req.session.user = user; //添加session
 					res.send({
@@ -61,7 +66,7 @@ class User{
 
 	//注册
 	signUp(req, res, next){
-		var pars = {
+		let pars = {
 			name:req.body.name,
 			passWord:req.body.passWord
 		}

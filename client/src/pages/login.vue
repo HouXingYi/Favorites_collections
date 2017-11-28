@@ -86,13 +86,11 @@ export default {
         let data = response.data;
         let status = data.status;
         let msg = data.msg;
-        console.log(status);
         if(status == -1){//不存在该账户
           alert(msg);
         }else if(status == 0){//密码错误
           alert(msg);
         }else if(status == 1){//密码正确
-          alert(msg);
           _this.$emit('logined');          
         }
       })
@@ -106,7 +104,7 @@ export default {
     },
     showLogin(){
       this.isShowLogin = true;
-      this.isShowSignUp = false;
+      this.isShowSignUp = false;  
     }
   }
 }
