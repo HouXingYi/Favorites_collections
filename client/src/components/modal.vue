@@ -1,8 +1,9 @@
 <template>
-  <div class="hModal" v-if="isShow">
+  <div class="hModal" v-if="visible">
       <div  class="ModalCon" 
             :style="{ height: size.height + 'px', width: size.width + 'px' }">
           <slot></slot>
+          <button @click="modalCenter">确定</button>
       </div>
       <div class="closeBtn" @click="closeModal">关闭</div>
       <div class="hModalMask"></div>
@@ -12,7 +13,7 @@
 export default {
   name: 'modal',
   props :{
-    isShow : {
+    value : {
         type : Boolean,
         default : false
     },
@@ -23,11 +24,23 @@ export default {
   },
   data () {
     return {
+        visible : this.value
+    }
+  },
+  watch : {
+    value (val) {
+        this.visible = val;
     }
   },
   methods :{
     closeModal(){
-        this.$emit("close");
+        this.visible = false;
+        this.$emit('input', false); //这个非常重要，通过emit一个input事件来更新v-model数据 
+    },
+    modalCenter(){
+        this.visible = false;
+        this.$emit('input', false); //这个非常重要，通过emit一个input事件来更新v-model数据 
+        this.$emit('ok', false); 
     }
   }
 }

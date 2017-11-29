@@ -4,30 +4,21 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import axios from 'axios'
-import Vuex from 'vuex'
-Vue.prototype.$ajax = axios
-Vue.config.productionTip = false
+import store from './store'
 
-//vuexStart
-Vue.use(Vuex);
-const store = new Vuex.Store({
-  state: {
-    userName:''
-  },
-  mutations: {
-    //更新用户信息
-    updateUserInfo(state, userName) {
-      state.userName = userName;
-    }
-  }
-});
+Vue.config.productionTip = false
+Vue.prototype.$ajax = axios
 Vue.prototype.$store = store;
-//vuexEnd
 
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
   router,
   template: '<App/>',
-  components: { App }
+  components: { App },
+  data () {
+    return {
+      Bus: new Vue()
+    }
+  }
 })

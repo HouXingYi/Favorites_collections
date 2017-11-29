@@ -1,7 +1,7 @@
 var mongoose = require("mongoose");
 var Schema = mongoose.Schema;
 var ObjectId = Schema.Types.ObjectId;
-
+//收藏夹名
 var collectionsListSchema = new mongoose.Schema({
     userName : {type:ObjectId,ref:'User'},
     collectionId : String,

@@ -40,6 +40,13 @@ export default {
   data () {
     return {
     }
+  },
+  mounted(){
+    this.$root.Bus.$on('showCollectionDetail', (id)=>{
+      
+      console.log(id);
+
+    });
   }
 }
 </script>
