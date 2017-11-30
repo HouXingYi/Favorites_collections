@@ -22,31 +22,96 @@
       </div>
       <div class="ConListConatiner clearfix">
         <ul>
-          <li class="ConItem">item1</li>
-          <li class="ConItem">item2</li>
-          <li class="ConItem">item3</li>
-          <li class="ConItem">item4</li>
-          <li class="ConItem">item5</li>
-          <li class="ConItem">item6</li>
+          <li class="ConItem addNewItem" @click="showModal"></li>
+          <li class="ConItem" v-for="(item,index) in itemList" @click="jumpLink(index)">
+            {{item.itemTitle}}
+          </li>
         </ul>
       </div>
     </div>
+    <Modal v-model="modalShow" :size="modalSize" @ok="addNewItem">
+      <div class="collectionModalBox">
+        <span>网址</span> <br>
+        <input type="text" v-model="itemURL"> <br>
+        <span>标题</span> <br>
+        <input type="text" v-model="itemTitle"> <br>
+        <span>描述</span> <br>
+        <input type="text" v-model="itemDesc"> <br>
+      </div>
+    </Modal>
   </div>
 </template>
 <script>
-
+import Modal from '../components/modal'
 export default {
   name: 'mainContainer',
   data () {
     return {
+      modalShow : false,
+      modalSize : {
+        height : 300,
+        width : 500
+      },
+      listId : '',
+      itemURL : '',
+      itemTitle : '',
+      itemDesc : '',
+      itemList : []
     }
   },
   mounted(){
-    this.$root.Bus.$on('showCollectionDetail', (id)=>{
-      
-      console.log(id);
-
+    let _this = this;
+    //左侧切换展现
+    this.$root.Bus.$on('showCollectionDetail', (listItem)=>{
+      let id = listItem.item.collectionId;
+      _this.listId = id;
+      _this.showItems(id);
     });
+  },
+  methods : {
+    addNewItem(){
+      let _this = this;
+      this.$ajax.post('/server/addNewItem', {
+        id : _this.listId,
+        itemURL : _this.itemURL,
+        itemTitle : _this.itemTitle,
+        itemDesc : _this.itemDesc
+      })
+      .then(function (response) {
+        var data = response.data;
+        if(data.status == 1){
+          _this.showItems(_this.listId);
+        }
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+    },
+    showModal(){
+      this.modalShow = true;
+    },
+    //展现数据
+    showItems(id){
+      let _this = this;
+      this.$ajax.post('/server/getItemList', {
+        id : id
+      })
+      .then(function (response) {
+        var data = response.data;
+        _this.itemList = data.list;
+        console.log(_this.itemList);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+    },
+    jumpLink(index){
+      let link = this.itemList[index].itemURL;
+      window.location.href = link;
+    }
+  },
+  components : {
+    Modal
   }
 }
 </script>
@@ -57,7 +122,7 @@ export default {
   left: 200px;
   right: 0;
   bottom: 0;  
-  z-index: -1;
+  z-index: 0;
   .ConTopBar{
     height: 50px;
     border-bottom: 1px solid #ddd;
@@ -124,6 +189,10 @@ export default {
         margin: 10px;
         border: 1px solid #ddd;
         border-radius: 5px;
+        cursor: pointer;
+        &.addNewItem{
+          background: #123456;
+        }
       }
     }
   }

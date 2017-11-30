@@ -47,14 +47,11 @@ export default {
       let _this = this;
       this.$ajax.get('/server/logout')
       .then(function (response) {
-
         let data = response.data;
         let status = data.status;
-
         if(status == 0){
           _this.$emit('logout');
         }
-
       })
       .catch(function (error) {
       });
@@ -67,6 +64,7 @@ export default {
   height: 60px;
   background: #23262E;
   color: #fff;
+  z-index: 0;
   .headerLogo{
     width: 150px;
     height: 50px;

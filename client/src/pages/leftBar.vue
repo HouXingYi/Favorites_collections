@@ -73,8 +73,11 @@ export default {
         let status = data.status;
         if(status == 1){
           let list = data.docs;
-          console.log(list);
           _this.collectionsList = list;
+          _this.$root.Bus.$emit('showCollectionDetail', {
+            item : list[0],
+            index : 0
+          });
         }
       })
       .catch(function (error) {
@@ -85,8 +88,11 @@ export default {
       this.modalShow = true;
     },
     showCollectionDetail(index){
-      let id = this.collectionsList[index].collectionId;
-      this.$root.Bus.$emit('showCollectionDetail', id);
+      let collectionsList = this.collectionsList[index];
+      this.$root.Bus.$emit('showCollectionDetail', {
+        item : collectionsList,
+        index : index
+      });
     }
   },
   components : {

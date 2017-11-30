@@ -44,6 +44,7 @@ class CollectionsList{
 		})
 	}
 	getAllAddCollections(req, res, next){
+
 		CollectionsListModal
 		.find()
 		.populate('userName','name')
@@ -54,6 +55,7 @@ class CollectionsList{
 				docs : docs
 			});
 		});
+		
 	}
 
 }
