@@ -117,7 +117,6 @@ export default {
     top: 0;
     right: 0;
     bottom: 0;
-    z-index: -100;
   }
   .loginBox{
     width: 300px;

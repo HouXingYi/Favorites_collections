@@ -44,18 +44,22 @@ class CollectionsList{
 		})
 	}
 	getAllAddCollections(req, res, next){
-
-		CollectionsListModal
-		.find()
-		.populate('userName','name')
-		.exec((err,docs)=>{
-			res.send({
-				status : 1,
-				msg : 'success',
-				docs : docs
+		let userName = req.query.userName;
+		user
+		.findOne({name : userName})
+		.exec((err,doc)=>{
+			let userId = doc._id;
+			CollectionsListModal
+			.find({userName : userId})
+			.populate('userName','name')
+			.exec((err,docs)=>{
+				res.send({
+					status : 1,
+					msg : 'success',
+					docs : docs
+				});
 			});
-		});
-		
+		})
 	}
 
 }

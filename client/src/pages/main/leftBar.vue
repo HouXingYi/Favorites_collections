@@ -2,7 +2,7 @@
   <div class="leftBar">
     <div class="addNew" @click="showModal">新建收藏夹</div>
     <ul class="collectionsList">
-      <li class="colItem" v-for="(collectionItem,index) in collectionsList" >
+      <li class="colItem" v-for="(collectionItem,index) in collectionsList" :class="{'active':index==activeIndex}">
         <a href="#" 
            :dataColId="collectionItem.collectionId"
            @click="showCollectionDetail(index)">
@@ -10,18 +10,22 @@
         </a>
       </li>
     </ul>
-    <Modal v-model="modalShow" :size="modalSize" @ok="addCollection">
-      <div class="collectionModalBox">
+    <Modal v-model="modalShow" 
+           :size="modalSize"
+           :title="modalTitle"
+           @ok="addCollection" 
+           v-dom-portal>
+      <div class="collectionModalBox" style="line-height:48px;">
         <span>收藏夹名字</span> <br>
-        <input type="text" v-model="collectionName"> <br>
+        <input class="Hinput" type="text" v-model="collectionName"> <br>
         <span>描述</span> <br>
-        <input type="text" v-model="collectionDesc"> <br>
+        <input class="Hinput" type="text" v-model="collectionDesc"> <br>
       </div>
     </Modal>
   </div>
 </template>
 <script>
-import Modal from '../components/modal'
+import Modal from 'components/modal'
 export default {
   name: 'leftBar',
   data () {
@@ -31,15 +35,22 @@ export default {
         height : 300,
         width : 500
       },
+      modalTitle : '新建收藏夹',
       collectionName : '', //新建收藏夹名
       collectionDesc : '',  //新建收藏夹描述
-      collectionsList : []
+      collectionsList : [],
+      activeIndex : 0 //动态变化index
     }
   },
   mounted(){
     var _this = this;
-    // 获得收藏夹列表
-    this.getCollectionsList();
+    setTimeout(() => {
+      var userName = _this.$store.state.userName;
+      if(userName){
+        // 获得收藏夹列表
+        _this.getCollectionsList();
+      }
+    }, 0);
   },
   methods :{
     addCollection(){
@@ -67,7 +78,7 @@ export default {
     },
     getCollectionsList(){
       var _this = this; 
-      this.$ajax.get('/server/getCollections')
+      this.$ajax.get('/server/getCollections?userName='+_this.$store.state.userName)
       .then(function (response) {
         let data = response.data;
         let status = data.status;
@@ -76,7 +87,8 @@ export default {
           _this.collectionsList = list;
           _this.$root.Bus.$emit('showCollectionDetail', {
             item : list[0],
-            index : 0
+            index : 0,
+            collectionName : list[0].collectionName 
           });
         }
       })
@@ -88,10 +100,12 @@ export default {
       this.modalShow = true;
     },
     showCollectionDetail(index){
-      let collectionsList = this.collectionsList[index];
+      let collectionsItem = this.collectionsList[index];
+      this.activeIndex = index;
       this.$root.Bus.$emit('showCollectionDetail', {
-        item : collectionsList,
-        index : index
+        item : collectionsItem,
+        index : index,
+        collectionName : collectionsItem.collectionName 
       });
     }
   },
@@ -117,6 +131,13 @@ export default {
   }
   ul.collectionsList{
     .colItem{
+      &.active{
+        background: rgba(87, 173, 104, 0.18);
+        color: #00ab6b;
+      }
+      &:hover{
+        background: rgba(87, 173, 104, 0.18);
+      }
       a{
         display: inline-block;
         box-sizing: border-box;
@@ -124,9 +145,7 @@ export default {
         width: 100%;
         line-height: 40px;
         padding-left: 25px;
-        &:hover{
-          background: #f5f5f5;
-        }
+        
       }
     }
   }

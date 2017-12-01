@@ -64,7 +64,6 @@ export default {
   height: 60px;
   background: #23262E;
   color: #fff;
-  z-index: 0;
   .headerLogo{
     width: 150px;
     height: 50px;
@@ -92,6 +91,8 @@ export default {
     text-align: center;
     margin-right: 20px;
     width: 125px;
+    z-index: 100;
+    position: relative;
     .userCenterInfo{
       padding: 0 10px;
       height: 60px;

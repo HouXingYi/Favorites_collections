@@ -10,6 +10,13 @@ Vue.config.productionTip = false
 Vue.prototype.$ajax = axios
 Vue.prototype.$store = store;
 
+
+
+import DomPortal from 'vue-dom-portal'
+Vue.use(DomPortal)
+
+
+
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
