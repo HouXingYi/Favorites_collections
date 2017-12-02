@@ -51,6 +51,9 @@ export default {
         _this.getCollectionsList();
       }
     }, 0);
+    this.$root.Bus.$on('getAllcollectionsList', ()=>{
+      _this.getCollectionsList();
+    });
   },
   methods :{
     addCollection(){

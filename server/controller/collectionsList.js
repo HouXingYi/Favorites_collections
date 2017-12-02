@@ -44,6 +44,7 @@ class CollectionsList{
 		})
 	}
 	getAllAddCollections(req, res, next){
+
 		let userName = req.query.userName;
 		user
 		.findOne({name : userName})
@@ -60,8 +61,67 @@ class CollectionsList{
 				});
 			});
 		})
-	}
 
+	}
+	upDateCollection(req,res,next){
+		let userName = req.body.userName;
+		let oldCollectionName = req.body.oldCollectionName;
+		let newCollectionName = req.body.newCollectionName;
+		let newCollectionDesc = req.body.newCollectionDesc;
+		user
+		.findOne({name : userName})
+		.exec((err,doc)=>{
+			let userId = doc._id;
+			CollectionsListModal
+			.findOne({
+				userName : userId,
+				collectionName : oldCollectionName
+			})
+			.exec((err,doc)=>{
+				if(err){
+					console.log(err);
+				}else{
+					doc.collectionName = newCollectionName;
+					doc.collectionDesc = newCollectionDesc;
+					doc.save(function (err, updatedTank) {
+						if (err) return handleError(err);
+						res.send({
+							status : 1,
+							msg : 'success'
+						});
+					});
+				}
+			});
+		})
+	}
+	deleteCollection(req,res,next){
+		let userName = req.query.userName;
+		let cName = req.query.cName;
+		user
+		.findOne({
+			name : userName
+		})
+		.exec((err,doc)=>{
+			let userId = doc._id;
+			CollectionsListModal
+			.findOne({
+				userName : userId,
+				collectionName : cName
+			})
+			.exec((err,doc)=>{
+				doc.remove((err,doc)=>{
+					if(err){
+						console.log(err)
+					}else{
+						res.send({
+							status : 1,
+							msg : 'success'
+						});
+					}
+				});
+			});
+		})
+	}
 }
 
 module.exports = new CollectionsList()

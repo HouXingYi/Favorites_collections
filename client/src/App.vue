@@ -7,11 +7,9 @@
   </div>
 </template>
 <script>
-
 import topHeader from 'pages/main/topHeader.vue'
 import leftBar from 'pages/main/leftBar.vue'
 import mainCon from 'pages/main/mainCon.vue'
-
 import login from 'pages/login/login.vue'
 export default {
   name: 'app',
