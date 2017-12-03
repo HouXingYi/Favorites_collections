@@ -1,30 +1,173 @@
 <template>
     <div class="AddNewItemBox" >
-        <span>(重点)搜索</span> <br>
-        <label><input name="Fruit" type="radio" value="" />电影</label> 
-        <label><input name="Fruit" type="radio" value="" />书籍</label> 
-        <label><input name="Fruit" type="radio" value="" />音乐</label> 
+        <span>分类</span> <br>
+        <label><input name="Fruit" type="radio" value="0" v-model="cate" />自定义</label> 
+        <label><input name="Fruit" type="radio" value="1" v-model="cate" />电影</label> 
+        <label><input name="Fruit" type="radio" value="2" v-model="cate" />书籍</label> 
+        <label><input name="Fruit" type="radio" value="3" v-model="cate" />音乐</label>
         <br>
-        <input class="Hinput" 
-            style="width:500px;"
-            type="text"> <br>
+        <div class="searchBox" v-if="isSearchShow">
+            <span>搜索</span> <br>
+            <input class="Hinput" 
+                   style="width:500px;"
+                   type="text"
+                   v-model="qText"> <br>
+            <div class="Hbutton" style="width:100px;" @click="searchDouBan">搜索</div>
+        </div>
+        <div class="searchResult" v-if="isSearchShow">
+            <ul>
+                <li class="resultItem" 
+                    v-for="(item,index) in searchRlist" 
+                    @click="chooseItem(index)">
+                    {{item.title}}
+                </li>
+                
+            </ul>
+        </div>
         <span>网址</span> <br>
         <input class="Hinput" 
             style="width:500px;"
-            type="text" > <br>
+            type="text" 
+            v-model="itemURL"> <br>
         <span>标题</span> <br>
         <input class="Hinput" 
             style="width:500px;"
-            type="text" > <br>
+            type="text" 
+            v-model="itemTitle"> <br>
         <span>描述</span> <br>
-        <input class="Hinput" 
-            style="width:500px;"
-            type="text" > <br>
+        <textarea rows="5" cols="30"
+                  class="Hinput" 
+                  style="width:500px;height:auto;"
+                  type="text" 
+                  v-model="itemDesc" ></textarea>
+        <br>
+        <div class="Hbutton" style="width:100px;" @click="addNewItemEnter">确认</div>
     </div>
 </template>
 <script>
 export default {
+    data(){
+        return {
+            cate : '0',
+            itemURL : '',
+            itemTitle : '',
+            itemDesc : '',
+            qText : '', //搜索关键字
+            searchRlist : []
+        }
+    },
+    props:{
+        listId : ''
+    },
+    computed:{
+        isSearchShow(){
+            if(this.cate !== "0"){
+                return true
+            }else{
+                return false
+            }
+        }
+    },
+    methods:{
+        getCate(){
+            console.log(this.cate);
+        },
+        addNewItemEnter(){
+            let _this = this;
+            this.$ajax.post('/server/addNewItem', {
+                id : _this.listId,
+                itemURL : _this.itemURL,
+                itemTitle : _this.itemTitle,
+                itemDesc : _this.itemDesc,
+                itemType : parseInt(_this.cate)
+            })
+            .then(function (response) {
+                var data = response.data;
+                var status = data.status;
+                if(status == 1){
+
+                    _this.$emit('close');  
+                    _this.$root.Bus.$emit('getAllcollectionsList');
+
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+        },
+        searchDouBan(){
+            let _this = this;
+            let movieSearch = 'https://api.douban.com/v2/movie/search?q=';
+            let bookSearch = 'https://api.douban.com/v2/book/search?q=';
+            let musicSearch = 'https://api.douban.com/v2/music/search?q=';
+            let searchUrl = '';
+            if(this.cate == '1'){ //电影
+                searchUrl = movieSearch + this.qText;
+            }else if(this.cate == '2'){ //书籍
+                searchUrl = bookSearch + this.qText;
+            }else if(this.cate == '3'){ //音乐
+                searchUrl = musicSearch + this.qText;
+            }
+            this.$ajax.jsonp(searchUrl,function(err,data){
+                if (err) {
+                    console.error(err.message);
+                } else {
+                    if(_this.cate == '1'){ //电影
+                        _this.searchRlist = data.subjects;
+                    }else if(_this.cate == '2'){ //书籍
+                        _this.searchRlist = data.books;
+                    }else if(_this.cate == '3'){ //音乐
+                        _this.searchRlist = data.musics;
+                    }
+                }
+            })
+        },
+        chooseItem(index){
+            let _this = this;
+            let item = this.searchRlist[index];
+            let id = item.id;
+            let movieDetail = 'https://api.douban.com/v2/movie/subject/'+id;
+            let bookDetail = 'https://api.douban.com/v2/book/'+id;
+            let musicDetail = 'https://api.douban.com/v2/music/'+id;
+            let detailUrl = '';
+            if(this.cate == '1'){ //电影
+                detailUrl = movieDetail;
+            }else if(this.cate == '2'){ //书籍
+                detailUrl = bookDetail;
+            }else if(this.cate == '3'){ //音乐
+                detailUrl = musicDetail;
+            }
+            this.$ajax.jsonp(detailUrl,function(err,data){
+                if (err) {
+                    console.error(err.message);
+                } else {
+                    if(_this.cate == '1'){ //电影
+                        console.log(data);
+                        _this.itemDesc = data.summary; 
+                    }else if(_this.cate == '2'){ //书籍
+                        _this.itemDesc = data.summary; 
+                    }else if(_this.cate == '3'){ //音乐
+                        _this.itemDesc = data.summary; 
+                    }
+                    _this.itemURL = item.alt; 
+                    _this.itemTitle = item.title; 
+                }
+            })
+        }
+    }
 }
 </script>
 <style lang="scss">
+    .searchResult{
+        margin: 20px 20px;
+        .resultItem{
+            height: 30px;
+            line-height: 30px;
+            cursor: pointer;
+            padding-left: 20px;
+            &:hover{
+                background: #eee;
+            }
+        }
+    }
 </style>

@@ -5,9 +5,11 @@ import App from './App'
 import router from './router'
 import axios from 'axios'
 import store from './store'
+import jsonp  from 'jsonp'
 
 Vue.config.productionTip = false
 Vue.prototype.$ajax = axios
+Vue.prototype.$ajax.jsonp = jsonp
 Vue.prototype.$store = store;
 
 

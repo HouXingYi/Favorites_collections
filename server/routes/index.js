@@ -22,6 +22,8 @@ router.get('/server/deleteCollection', collectionsList.deleteCollection); //删�
 //收藏夹下的收藏列表
 router.post('/server/addNewItem', collectionsDetailList.addNewItem); //添加新收藏
 router.post('/server/getItemList', collectionsDetailList.getItemList); //获得收藏列表
+router.post('/server/updateItem', collectionsDetailList.updateItem); //更新收藏列表
+router.post('/server/deleteItem', collectionsDetailList.deleteItem); //删除收藏列表
 
 
 module.exports = router

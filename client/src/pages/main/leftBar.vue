@@ -119,7 +119,7 @@ export default {
 </script>
 <style lang="scss">
 .leftBar{
-  position: fixed;
+  position: absolute;
   width: 200px;
   border-right: 1px solid #e5e5e5;
   top: 60px;

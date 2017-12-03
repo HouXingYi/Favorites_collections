@@ -2,6 +2,7 @@
   <div class="mainContainer">
     <div class="mainBox">
       <div class="ConTopBar">
+
         <div class="mainTopBar" v-show="isMainTopBar">
           <div class="myFavor topleft">
             {{collectionName}}
@@ -15,14 +16,22 @@
             设置收藏夹
           </div>
         </div>
+
         <div class="editTopBar" v-show="isEditTopBar">
           <span @click="showMainCon" class="topleft">返回</span>
           <span class="topCenterTitle">设置收藏夹</span>
         </div>
+
         <div class="editTopBar" v-show="isAddNewItemBar">
           <span @click="showMainCon" class="topleft">返回</span>
           <span class="topCenterTitle">新增收藏</span>
         </div>
+
+        <div class="editTopBar" v-show="isitemDetailBar">
+          <span @click="showMainCon" class="topleft">返回</span>
+          <span class="topCenterTitle">item详情</span>
+        </div>
+
       </div>
       <div class="ConBody">
 
@@ -44,8 +53,12 @@
           <ul>
             <!-- <li class="ConItem addNewItem" @click="showModal"></li> -->
             <li class="ConItem addNewItem" @click="showAddNewItem"></li>
-            <li class="ConItem" v-for="(item,index) in itemList" @click="jumpLink(index)">
+            <li class="ConItem" 
+                v-for="(item,index) in itemList" 
+                @click="openLink(index)">
               {{item.itemTitle}}
+              <span class="setItem"
+                    @click.stop="openItemDetail(index)">设置</span>
             </li>
           </ul>
         </div>
@@ -54,9 +67,17 @@
                   :cName="collectionName"
                   @close="showMainCon">
         </editcoll>
-
-        <addNewItem v-show="isAddNewItem">
+        
+        <addNewItem v-show="isAddNewItem" 
+                    :listId="listId"
+                    @close="showMainCon">
         </addNewItem>
+
+        <itemDetail v-show="isitemDetail"
+                    :itemDetail="itemDetailObj"
+                    :listId="listId"
+                    @close="showMainCon">
+        </itemDetail>
 
       </div>
     </div>
@@ -65,6 +86,7 @@
 <script>
 import editcoll from 'pages/main/mainCon/editCollection'
 import addNewItem from 'pages/main/mainCon/addNewItem'
+import itemDetail from 'pages/main/mainCon/itemDetail'
 export default {
   name: 'mainContainer',
   data () {
@@ -80,21 +102,22 @@ export default {
       itemDesc : '',
       itemList : [],
       collectionName : '',
+      itemDetailObj : {},
 
+      isMainCon : true,
       isEdit : false,
       isAddNewItem : false,
-      isMainCon : true,
-
+      isitemDetail : false,
+      
       isMainTopBar : true,
       isEditTopBar : false,
-      isAddNewItemBar : false
+      isAddNewItemBar : false,
+      isitemDetailBar : false
 
     }
   },
   mounted(){
     let _this = this;
-    //调试用
-    this.showAddNewItem()
     //左侧切换展现
     this.$root.Bus.$on('showCollectionDetail', (listItem)=>{
       let id = listItem.item.collectionId;
@@ -122,9 +145,6 @@ export default {
         console.log(error);
       });
     },
-    showModal(){
-      this.modalShow = true;
-    },
     //展现数据
     showItems(id){
       let _this = this;
@@ -140,43 +160,67 @@ export default {
         console.log(error);
       });
     },
-    jumpLink(index){
-      let link = this.itemList[index].itemURL;
-      window.location.href = link;
+    openLink(index){
+      location.href = this.itemList[index].itemURL;
+    },
+    openItemDetail(index){
+      let item = this.itemList[index];
+      this.itemDetailObj = item;
+      this.showItemDetail()
     },
     showEditcoll(){
       //main
       this.isEdit = true;
       this.isAddNewItem = false;
       this.isMainCon = false;
+      this.isitemDetail = false;
       //bar
       this.isEditTopBar = true;
       this.isMainTopBar = false;
+      this.isAddNewItemBar = false;
+      this.isitemDetailBar = false;
     },
     showAddNewItem(){
       //main
-      this.isAddNewItem = true;
       this.isEdit = false;
+      this.isAddNewItem = true;
       this.isMainCon = false;
+      this.isitemDetail = false;
       //bar
-      this.isAddNewItemBar = true;
       this.isEditTopBar = false;
       this.isMainTopBar = false;
+      this.isAddNewItemBar = true;
+      this.isitemDetailBar = false;
     },
     showMainCon(){
       //main
-      this.isMainCon = true;
       this.isEdit = false;
       this.isAddNewItem = false;
+      this.isMainCon = true;
+      this.isitemDetail = false;
       //bar
-      this.isMainTopBar = true;
       this.isEditTopBar = false;
+      this.isMainTopBar = true;
       this.isAddNewItemBar = false;
+      this.isitemDetailBar = false;
+    },
+    showItemDetail(){
+      //main
+      this.isEdit = false;
+      this.isAddNewItem = false;
+      this.isMainCon = false;
+      this.isitemDetail = true;
+      //bar
+      this.isEditTopBar = false;
+      this.isMainTopBar = false;
+      this.isAddNewItemBar = false;
+      this.isitemDetailBar = true;
     }
   },
   components : {
     editcoll,
-    addNewItem
+    addNewItem,
+    itemDetail
   }
 }
 </script>
@@ -281,8 +325,18 @@ export default {
         border: 1px solid #ddd;
         border-radius: 5px;
         cursor: pointer;
+        position: relative;
         &.addNewItem{
           background: #123456;
+        }
+        .setItem{
+          position: absolute;
+          right: 10px;
+          bottom: 10px;
+          color: #000;
+          &:hover{
+            color: red;
+          }
         }
       }
     }

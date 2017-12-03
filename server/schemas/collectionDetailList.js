@@ -8,7 +8,8 @@ var collectionDetailList = new mongoose.Schema({
         {
             "itemURL":String,
             "itemTitle":String,
-            "itemDesc":String
+            "itemDesc":String,
+            "itemType":Number
         }
     ]
 });

@@ -5,10 +5,12 @@ class collectionDetailList{
 	constructor(){
 	}
 	addNewItem(req, res, next){
+		console.log(req.body);
 		let  id = req.body.id;
 		let  itemURL = req.body.itemURL;
 		let  itemTitle = req.body.itemTitle;
 		let  itemDesc = req.body.itemDesc;
+		let  itemType = req.body.itemType;
 		collectionListModel.findOne({collectionId:id},function(err,doc){
 			var list_id = doc._id;
 			collectionDetailListModel
@@ -19,7 +21,8 @@ class collectionDetailList{
 					item.CollectionItems.push({
 						"itemURL":itemURL,
 						"itemTitle":itemTitle,
-						"itemDesc":itemDesc
+						"itemDesc":itemDesc,
+						"itemType":itemType
 					})
 					item.save((err,item)=>{
 						res.send({
@@ -35,7 +38,8 @@ class collectionDetailList{
 							{
 								"itemURL":itemURL,
 								"itemTitle":itemTitle,
-								"itemDesc":itemDesc
+								"itemDesc":itemDesc,
+								"itemType":itemType
 							}
 						]
 					})
@@ -46,7 +50,8 @@ class collectionDetailList{
 						else {
 							res.send({
 								status : 1,
-								msg : '新建成功'
+								msg : '新建成功',
+								doc : doc
 							});
 						}
 					})
@@ -76,6 +81,69 @@ class collectionDetailList{
 						list :[]
 					});
 				}
+			})
+		})
+	}
+	updateItem(req, res, next){
+		let doc = req.body;
+		let itemURL = doc.itemURL;
+		let itemDesc = doc.itemDesc;
+		let itemTitle = doc.itemTitle;
+		let itemType = doc.itemType;
+		let itemId = doc.itemId;
+		let listId = doc.listId;
+		collectionListModel.findOne({collectionId:listId},function(err,doc){
+			var list_id = doc._id;
+			collectionDetailListModel
+			.findOne({CollectionsFA : list_id})
+			.populate('CollectionsFA')
+			.exec(function(err,doc){
+				var list = doc.CollectionItems;
+				list.forEach(element => {
+					let id = element._id;
+					if(id == itemId){
+						element.itemURL = itemURL;
+						element.itemDesc = itemDesc;
+						element.itemTitle = itemTitle;
+						element.itemType = itemType;
+					}
+				});
+				doc.save((err,items)=>{
+					res.send({
+						status : 1,
+						msg : 'success',
+						doc :items
+					});
+				})
+			})
+		})
+
+	}
+	deleteItem(req, res, next){
+		let doc = req.body;
+		let itemId = doc.itemId;
+		let listId = doc.listId;
+		collectionListModel.findOne({collectionId:listId},function(err,doc){
+			var list_id = doc._id;
+			collectionDetailListModel
+			.findOne({CollectionsFA : list_id})
+			.populate('CollectionsFA')
+			.exec(function(err,doc){
+				var list = doc.CollectionItems;
+				var delIndex = 0;
+				list.forEach((element,index) => {
+					let id = element._id;
+					if(id == itemId){
+						delIndex = index;
+					}
+				});
+				list.splice(delIndex,1);
+				doc.save((err,items)=>{
+					res.send({
+						status : 1,
+						msg : 'success'
+					});
+				})
 			})
 		})
 	}
