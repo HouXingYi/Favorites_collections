@@ -11,6 +11,8 @@ class collectionDetailList{
 		let  itemTitle = req.body.itemTitle;
 		let  itemDesc = req.body.itemDesc;
 		let  itemType = req.body.itemType;
+		let  coverPic = req.body.coverPic;
+		coverPic
 		collectionListModel.findOne({collectionId:id},function(err,doc){
 			var list_id = doc._id;
 			collectionDetailListModel
@@ -22,7 +24,8 @@ class collectionDetailList{
 						"itemURL":itemURL,
 						"itemTitle":itemTitle,
 						"itemDesc":itemDesc,
-						"itemType":itemType
+						"itemType":itemType,
+						"coverPic":coverPic
 					})
 					item.save((err,item)=>{
 						res.send({
@@ -39,7 +42,8 @@ class collectionDetailList{
 								"itemURL":itemURL,
 								"itemTitle":itemTitle,
 								"itemDesc":itemDesc,
-								"itemType":itemType
+								"itemType":itemType,
+								"coverPic":coverPic
 							}
 						]
 					})

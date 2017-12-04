@@ -34,6 +34,15 @@
             style="width:500px;"
             type="text" 
             v-model="itemTitle"> <br>
+        <span>封面</span> <br>
+        <img class="defaultPicHolder" :src="coverPic" alt=""> <br>
+
+        <!-- 先不做 -->
+        <!-- <label for="defaultPic" class="upLoadPicLabel">
+            点击上传图片
+            <input id="defaultPic" type="file" >
+        </label> <br> -->
+
         <span>描述</span> <br>
         <textarea rows="5" cols="30"
                   class="Hinput" 
@@ -53,7 +62,8 @@ export default {
             itemTitle : '',
             itemDesc : '',
             qText : '', //搜索关键字
-            searchRlist : []
+            searchRlist : [],
+            coverPic : 'static/default.png'
         }
     },
     props:{
@@ -79,16 +89,15 @@ export default {
                 itemURL : _this.itemURL,
                 itemTitle : _this.itemTitle,
                 itemDesc : _this.itemDesc,
-                itemType : parseInt(_this.cate)
+                itemType : parseInt(_this.cate),
+                coverPic : _this.coverPic
             })
             .then(function (response) {
                 var data = response.data;
                 var status = data.status;
                 if(status == 1){
-
                     _this.$emit('close');  
                     _this.$root.Bus.$emit('getAllcollectionsList');
-
                 }
             })
             .catch(function (error) {
@@ -142,13 +151,13 @@ export default {
                     console.error(err.message);
                 } else {
                     if(_this.cate == '1'){ //电影
-                        console.log(data);
                         _this.itemDesc = data.summary; 
                     }else if(_this.cate == '2'){ //书籍
                         _this.itemDesc = data.summary; 
                     }else if(_this.cate == '3'){ //音乐
                         _this.itemDesc = data.summary; 
                     }
+                    _this.coverPic = item.images.large;
                     _this.itemURL = item.alt; 
                     _this.itemTitle = item.title; 
                 }
@@ -158,6 +167,15 @@ export default {
 }
 </script>
 <style lang="scss">
+    .defaultPicHolder{
+        height: 200px;
+        width: 150px;
+    }
+    .upLoadPicLabel{
+        input{
+            display: none;
+        }
+    }
     .searchResult{
         margin: 20px 20px;
         .resultItem{

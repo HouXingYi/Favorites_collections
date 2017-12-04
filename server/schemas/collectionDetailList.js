@@ -9,7 +9,8 @@ var collectionDetailList = new mongoose.Schema({
             "itemURL":String,
             "itemTitle":String,
             "itemDesc":String,
-            "itemType":Number
+            "itemType":Number,
+            "coverPic":String
         }
     ]
 });

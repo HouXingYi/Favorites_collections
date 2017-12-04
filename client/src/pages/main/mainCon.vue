@@ -2,52 +2,46 @@
   <div class="mainContainer">
     <div class="mainBox">
       <div class="ConTopBar">
-
         <div class="mainTopBar" v-show="isMainTopBar">
           <div class="myFavor topleft">
             {{collectionName}}
           </div>
-          
           <!-- <div class="editAll">
             <a href="" class="editAllLink">批量编辑网站</a>
           </div> -->
-
           <div class="editCollection" @click="showEditcoll">
             设置收藏夹
           </div>
         </div>
-
         <div class="editTopBar" v-show="isEditTopBar">
           <span @click="showMainCon" class="topleft">返回</span>
           <span class="topCenterTitle">设置收藏夹</span>
         </div>
-
         <div class="editTopBar" v-show="isAddNewItemBar">
           <span @click="showMainCon" class="topleft">返回</span>
           <span class="topCenterTitle">新增收藏</span>
         </div>
-
         <div class="editTopBar" v-show="isitemDetailBar">
           <span @click="showMainCon" class="topleft">返回</span>
           <span class="topCenterTitle">item详情</span>
         </div>
-
       </div>
       <div class="ConBody">
 
-        <!-- 分组开始 -->
-        <!-- <div class="groupControlBar">
+        <div class="groupControlBar" v-show="isMainCon">
+          
           <ul class="groupList">
             <li class="curAdr"><a href="#">全部</a></li>
-            <li><a href="#">分组1</a></li>
-            <li><a href="#">分组2</a></li>
-            <li><a href="#">分组3</a></li>
-            <li><a href="#">分组4</a></li>
+            <li><a href="#">自定义</a></li>
+            <li><a href="#">电影</a></li>
+            <li><a href="#">书籍</a></li>
+            <li><a href="#">音乐</a></li>
           </ul>
-          <div class="addGroup">添加</div>
-          <div class="editGroup">编辑</div>
-        </div> -->
-        <!-- 分组结束 -->
+
+          <!-- <div class="addGroup">添加</div> -->
+          <!-- <div class="editGroup">编辑</div> -->
+
+        </div>
 
         <div class="ConListConatiner clearfix" v-show="isMainCon">
           <ul>
@@ -57,28 +51,25 @@
                 v-for="(item,index) in itemList" 
                 @click="openLink(index)">
               {{item.itemTitle}}
+              <img :src="item.coverPic" alt="" class="coverPicHolder">
               <span class="setItem"
                     @click.stop="openItemDetail(index)">设置</span>
             </li>
           </ul>
         </div>
-
         <editcoll v-show="isEdit" 
                   :cName="collectionName"
                   @close="showMainCon">
         </editcoll>
-        
         <addNewItem v-show="isAddNewItem" 
                     :listId="listId"
                     @close="showMainCon">
         </addNewItem>
-
         <itemDetail v-show="isitemDetail"
                     :itemDetail="itemDetailObj"
                     :listId="listId"
                     @close="showMainCon">
         </itemDetail>
-
       </div>
     </div>
   </div>
@@ -101,6 +92,7 @@ export default {
       itemTitle : '',
       itemDesc : '',
       itemList : [],
+      coverPic : '',
       collectionName : '',
       itemDetailObj : {},
 
@@ -118,6 +110,8 @@ export default {
   },
   mounted(){
     let _this = this;
+    //测试
+    // this.showAddNewItem();
     //左侧切换展现
     this.$root.Bus.$on('showCollectionDetail', (listItem)=>{
       let id = listItem.item.collectionId;
@@ -127,24 +121,6 @@ export default {
     });
   },
   methods : {
-    addNewItem(){
-      let _this = this;
-      this.$ajax.post('/server/addNewItem', {
-        id : _this.listId,
-        itemURL : _this.itemURL,
-        itemTitle : _this.itemTitle,
-        itemDesc : _this.itemDesc
-      })
-      .then(function (response) {
-        var data = response.data;
-        if(data.status == 1){
-          _this.showItems(_this.listId);
-        }
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
-    },
     //展现数据
     showItems(id){
       let _this = this;
@@ -154,7 +130,6 @@ export default {
       .then(function (response) {
         var data = response.data;
         _this.itemList = data.list;
-        // console.log(_this.itemList);
       })
       .catch(function (error) {
         console.log(error);
@@ -280,7 +255,6 @@ export default {
       }
     }
     .editTopBar{
-
     }
   }
   .ConBody{
@@ -328,6 +302,13 @@ export default {
         position: relative;
         &.addNewItem{
           background: #123456;
+        }
+        .coverPicHolder{
+          position: absolute;
+          width: 145px;
+          height: 166px;
+          right: 45px;
+          bottom: 10px;
         }
         .setItem{
           position: absolute;
