@@ -29,18 +29,16 @@
       <div class="ConBody">
 
         <div class="groupControlBar" v-show="isMainCon">
-          
           <ul class="groupList">
-            <li class="curAdr"><a href="#">全部</a></li>
-            <li><a href="#">自定义</a></li>
-            <li><a href="#">电影</a></li>
-            <li><a href="#">书籍</a></li>
-            <li><a href="#">音乐</a></li>
+            <li :class="{'curAdr':-1==nowCate}" @click="changeCate(-1)"><a href="#">全部</a></li>
+            <li :class="{'curAdr':index==nowCate}" 
+                v-for="(cate,index) in cateList" 
+                @click="changeCate(index)">
+              <a href="#">{{cate.cateName}}</a>
+            </li>
           </ul>
-
           <!-- <div class="addGroup">添加</div> -->
           <!-- <div class="editGroup">编辑</div> -->
-
         </div>
 
         <div class="ConListConatiner clearfix" v-show="isMainCon">
@@ -48,7 +46,7 @@
             <!-- <li class="ConItem addNewItem" @click="showModal"></li> -->
             <li class="ConItem addNewItem" @click="showAddNewItem"></li>
             <li class="ConItem" 
-                v-for="(item,index) in itemList" 
+                v-for="(item,index) in showItemList" 
                 @click="openLink(index)">
               {{item.itemTitle}}
               <img :src="item.coverPic" alt="" class="coverPicHolder">
@@ -63,6 +61,7 @@
         </editcoll>
         <addNewItem v-show="isAddNewItem" 
                     :listId="listId"
+                    :cateList="cateList"
                     @close="showMainCon">
         </addNewItem>
         <itemDetail v-show="isitemDetail"
@@ -92,6 +91,9 @@ export default {
       itemTitle : '',
       itemDesc : '',
       itemList : [],
+      showItemList : [],
+      cateList : [],
+      nowCate : -1,
       coverPic : '',
       collectionName : '',
       itemDetailObj : {},
@@ -114,6 +116,7 @@ export default {
     // this.showAddNewItem();
     //左侧切换展现
     this.$root.Bus.$on('showCollectionDetail', (listItem)=>{
+      _this.cateList = listItem.item.cateList;
       let id = listItem.item.collectionId;
       _this.listId = id;
       _this.showItems(id);
@@ -124,16 +127,19 @@ export default {
     //展现数据
     showItems(id){
       let _this = this;
+
       this.$ajax.post('/server/getItemList', {
         id : id
       })
       .then(function (response) {
         var data = response.data;
         _this.itemList = data.list;
+        _this.filterItemlist();
       })
       .catch(function (error) {
         console.log(error);
       });
+
     },
     openLink(index){
       location.href = this.itemList[index].itemURL;
@@ -142,6 +148,25 @@ export default {
       let item = this.itemList[index];
       this.itemDetailObj = item;
       this.showItemDetail()
+    },
+    changeCate(index){
+      this.nowCate = index;
+      this.showItems(this.listId);
+    },
+    filterItemlist(){
+      let _this = this;
+      let cate = this.nowCate;
+      this.showItemList = [];
+      if(cate == -1){
+        this.showItemList = this.itemList;
+      }else{
+        this.itemList.forEach(item => {
+          let type = item.itemType;
+          if(type == cate){
+            _this.showItemList.push(item);
+          }
+        });
+      }
     },
     showEditcoll(){
       //main
@@ -264,6 +289,9 @@ export default {
       line-height: 55px;
       margin-left: -5px;
       .groupList{
+        .curAdr a{
+          background: lightblue;
+        }
         li{
           float: left;
           margin: 0 5px;

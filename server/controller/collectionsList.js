@@ -8,10 +8,12 @@ class CollectionsList{
 		let userName = req.body.userName;
 		let collectionName = req.body.collectionName;
 		let collectionDesc = req.body.collectionDesc;
+		let cateList = req.body.cateList;
 		let pars = {
 			collectionId : parseInt(100000*Math.random()),
 			collectionName : collectionName,
-			collectionDesc : collectionDesc
+			collectionDesc : collectionDesc,
+			cateList : cateList
 		}
 		CollectionsListModal.find({collectionName:pars.collectionName},function(err, collection){ 
 			if (err) {

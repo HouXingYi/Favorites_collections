@@ -66,7 +66,25 @@ export default {
       this.$ajax.post('/server/addCollection', {
         'userName': userName,
         'collectionName' : _this.collectionName,
-        'collectionDesc' : _this.collectionDesc
+        'collectionDesc' : _this.collectionDesc,
+        'cateList' : [
+            {
+                cateNum : 0,
+                cateName : "网站"
+            },
+            {
+                cateNum : 1,
+                cateName : "电影"
+            },
+            {
+                cateNum : 2,
+                cateName : "书籍"
+            },
+            {
+                cateNum : 3,
+                cateName : "音乐"
+            }
+        ]
       })
       .then(function (response) {
         var data = response.data;

@@ -7,7 +7,13 @@ var collectionsListSchema = new mongoose.Schema({
     collectionId : String,
     collectionName : String, 
     collectionDesc : String, //描述
-    collectionNum : Number //排序
+    collectionNum : Number, //排序
+    cateList : [
+        {
+            cateNum : Number,
+            cateName : String
+        }
+    ]
 });
 
 module.exports = collectionsListSchema

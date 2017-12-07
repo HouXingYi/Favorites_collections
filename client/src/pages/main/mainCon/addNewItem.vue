@@ -1,10 +1,16 @@
 <template>
     <div class="AddNewItemBox" >
         <span>分类</span> <br>
-        <label><input name="Fruit" type="radio" value="0" v-model="cate" />自定义</label> 
-        <label><input name="Fruit" type="radio" value="1" v-model="cate" />电影</label> 
-        <label><input name="Fruit" type="radio" value="2" v-model="cate" />书籍</label> 
-        <label><input name="Fruit" type="radio" value="3" v-model="cate" />音乐</label>
+
+        <label v-for="(cateItem,index) in cateList">
+            <input name="Fruit" type="radio" :value="cateItem.cateNum" v-model="cate" />
+            {{cateItem.cateName}}
+        </label> 
+
+        <!-- <label><input name="Fruit" type="radio" value="1" v-model="cate" />电影</label>  -->
+        <!-- <label><input name="Fruit" type="radio" value="2" v-model="cate" />书籍</label>  -->
+        <!-- <label><input name="Fruit" type="radio" value="3" v-model="cate" />音乐</label> -->
+
         <br>
         <div class="searchBox" v-if="isSearchShow">
             <span>搜索</span> <br>
@@ -21,7 +27,6 @@
                     @click="chooseItem(index)">
                     {{item.title}}
                 </li>
-                
             </ul>
         </div>
         <span>网址</span> <br>
@@ -57,7 +62,7 @@
 export default {
     data(){
         return {
-            cate : '0',
+            cate : 0,
             itemURL : '',
             itemTitle : '',
             itemDesc : '',
@@ -67,11 +72,15 @@ export default {
         }
     },
     props:{
-        listId : ''
+        listId : '',
+        cateList : {
+            type : Array,
+            default : []
+        }
     },
     computed:{
         isSearchShow(){
-            if(this.cate !== "0"){
+            if(this.cate !== 0){
                 return true
             }else{
                 return false
@@ -79,9 +88,6 @@ export default {
         }
     },
     methods:{
-        getCate(){
-            console.log(this.cate);
-        },
         addNewItemEnter(){
             let _this = this;
             this.$ajax.post('/server/addNewItem', {
@@ -152,12 +158,15 @@ export default {
                 } else {
                     if(_this.cate == '1'){ //电影
                         _this.itemDesc = data.summary; 
+                        _this.coverPic = item.images.large;
                     }else if(_this.cate == '2'){ //书籍
                         _this.itemDesc = data.summary; 
+                        _this.coverPic = item.images.large;
                     }else if(_this.cate == '3'){ //音乐
                         _this.itemDesc = data.summary; 
+                        _this.coverPic = item.image;
                     }
-                    _this.coverPic = item.images.large;
+                    console.log(item);
                     _this.itemURL = item.alt; 
                     _this.itemTitle = item.title; 
                 }
