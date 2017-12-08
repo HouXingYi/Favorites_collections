@@ -42,9 +42,8 @@ export default {
   },
   methods :{
     signUp(){
-      let _this = this;
-      let userName = _this.signUpUserName
-      let passWord = _this.signPassWord
+      let userName = this.signUpUserName
+      let passWord = this.signPassWord
       if( userName == '' || passWord == '' ){
         alert("请输入密码或用户名！");
         return false
@@ -53,17 +52,17 @@ export default {
         'name': userName,
         'passWord': passWord
       })
-      .then(function (response) {
+      .then((response) => {
         let data = response.data;
         let status = data.status;
         let msg = data.msg;
         if(status == 0){//重复注册
           alert(msg);
-          _this.signUpUserName = '';
-          _this.signPassWord = '';
+          this.signUpUserName = '';
+          this.signPassWord = '';
         }else if(status == 1){//注册成功
           alert(msg);
-          _this.showLogin();
+          this.showLogin();
         }
       })
       .catch(function (error) {
@@ -71,9 +70,8 @@ export default {
       });
     },
     login(){
-      var _this = this;
-      let userName = _this.loginUserName
-      let passWord = _this.loginPassWord
+      let userName = this.loginUserName
+      let passWord = this.loginPassWord
       if( userName == '' || passWord == '' ){
         alert("请输入密码或用户名！");
         return false
@@ -82,7 +80,7 @@ export default {
         'name': userName,
         'passWord': passWord
       })
-      .then(function (response) {
+      .then((response) => {
         let data = response.data;
         let status = data.status;
         let msg = data.msg;
@@ -91,10 +89,10 @@ export default {
         }else if(status == 0){//密码错误
           alert(msg);
         }else if(status == 1){//密码正确
-          _this.$emit('logined');          
+          this.$emit('logined');          
         }
       })
-      .catch(function (error) {
+      .catch((error) => {
         console.log(error);
       });
     },

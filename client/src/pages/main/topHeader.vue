@@ -4,7 +4,7 @@
     <div class="leftNav">
       <ul class="leftNavList">
         <li class="leftNavItem"><a href="#">首页</a></li>
-        <li class="leftNavItem"><a href="#">热门</a></li>
+        <!-- <li class="leftNavItem"><a href="#">热门</a></li> -->
       </ul>
     </div>
     <div class="userCenter" 
@@ -13,7 +13,7 @@
          :style="{background:userCenterBg}">
       <div class="userCenterInfo">{{userName}}</div>
       <ul class="userCenterDropdown" :style="{display:dropDownDis}">
-        <li>个人中心</li>
+        <!-- <li>个人中心</li> -->
         <li @click="logout">退出</li>
       </ul>
     </div>
@@ -44,13 +44,12 @@ export default {
       this.userCenterBg = "";
     },
     logout(){
-      let _this = this;
       this.$ajax.get('/server/logout')
-      .then(function (response) {
+      .then((response) => {
         let data = response.data;
         let status = data.status;
         if(status == 0){
-          _this.$emit('logout');
+          this.$emit('logout');
         }
       })
       .catch(function (error) {

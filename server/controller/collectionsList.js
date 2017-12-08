@@ -124,6 +124,34 @@ class CollectionsList{
 			});
 		})
 	}
+	getCollectionByName(req,res,next){
+		let userName = req.query.userName;
+		let cName = req.query.cName;
+		user
+		.findOne({
+			name : userName
+		})
+		.exec((err,doc)=>{
+			let userId = doc._id;
+			CollectionsListModal
+			.findOne({
+				userName : userId,
+				collectionName : cName
+			})
+			.exec((err,doc)=>{
+
+				res.send({
+					status : 1,
+					msg : 'success',
+					doc : {
+						collectionName : doc.collectionName,
+						collectionDesc : doc.collectionDesc
+					}
+				});
+
+			});
+		})
+	}
 }
 
 module.exports = new CollectionsList()

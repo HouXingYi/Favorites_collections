@@ -1,20 +1,27 @@
 <template>
     <div class="itemDetail" >
+
+        <span>封面</span> <br>
+        <img class="defaultPicHolder" :src="coverPic" alt=""> <br>
+
         <span>网址</span> <br>
         <input class="Hinput" 
             style="width:500px;"
             type="text" 
             v-model="itemURL"> <br>
+
         <span>标题</span> <br>
         <input class="Hinput" 
             style="width:500px;"
             type="text" 
             v-model="itemTitle"> <br>
+
         <span>类型</span> <br>
         <input class="Hinput" 
             style="width:500px;"
             type="text" 
             v-model="itemType"> <br>
+
         <span>描述</span> <br>
         <textarea rows="5" cols="30"
                   class="Hinput" 
@@ -22,14 +29,17 @@
                   type="text" 
                   v-model="itemDesc" ></textarea>
         <br>
+
         <div class="Hbutton" style="width:100px;" @click="updateItem">
             保存
         </div>
+
         <div class="Hbutton" 
              style="width:100px;background:red;"
              @click="deleteItem">
             删除
         </div>
+
     </div>
 </template>
 <script>
@@ -41,7 +51,8 @@ export default {
             itemDesc : '',
             itemTitle : '',
             itemType : '',
-            itemId : ''
+            itemId : '',
+            coverPic : ''
         }
     },
     props:{
@@ -56,52 +67,52 @@ export default {
     },
     watch : {
         itemDetail(item){
+            console.log(item);
             //手动赋值
             this.itemURL = item.itemURL;
             this.itemDesc = item.itemDesc;
             this.itemTitle = item.itemTitle;
             this.itemType = item.itemType;
             this.itemId = item._id;
+            this.coverPic = item.coverPic;
         }
     },
     methods:{
         updateItem(){
-            var _this = this;
             this.$ajax.post('/server/updateItem', {
-                itemURL : _this.itemURL,
-                itemDesc : _this.itemDesc,
-                itemTitle : _this.itemTitle,
-                itemType : _this.itemType,
-                itemId : _this.itemId,
-                listId : _this.listId
+                itemURL : this.itemURL,
+                itemDesc : this.itemDesc,
+                itemTitle : this.itemTitle,
+                itemType : this.itemType,
+                itemId : this.itemId,
+                listId : this.listId
             })
-            .then(function (response) {
+            .then((response) => {
                 var data = response.data;
                 var status = data.status;
                 if(status == 1){
-                    _this.$emit('close');  
-                    _this.$root.Bus.$emit('getAllcollectionsList');
+                    this.$emit('close');  
+                    this.$root.Bus.$emit('getAllcollectionsList');
                 }
             })
-            .catch(function (error) {
+            .catch((error) => {
                 console.log(error);
             });
         },
         deleteItem(){
-            var _this = this;
             this.$ajax.post('/server/deleteItem', {
-                itemId : _this.itemId,
-                listId : _this.listId
+                itemId : this.itemId,
+                listId : this.listId
             })
-            .then(function (response) {
+            .then((response) => {
                 var data = response.data;
                 var status = data.status;
                 if(status == 1){
-                    _this.$emit('close');  
-                    _this.$root.Bus.$emit('getAllcollectionsList');
+                    this.$emit('close');  
+                    this.$root.Bus.$emit('getAllcollectionsList');
                 }
             })
-            .catch(function (error) {
+            .catch((error) => {
                 console.log(error);
             });
         }
@@ -109,4 +120,10 @@ export default {
 }
 </script>
 <style lang="scss">
+.itemDetail{
+    line-height: 50px;
+    .Hbutton{
+        margin: 15px 0;
+    }
+}
 </style>

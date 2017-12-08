@@ -16,9 +16,9 @@
            @ok="addCollection" 
            v-dom-portal>
       <div class="collectionModalBox" style="line-height:48px;">
-        <span>收藏夹名字</span> <br>
+        <span class="t" style="margin-left: 16px;">收藏夹名字</span> <br>
         <input class="Hinput" type="text" v-model="collectionName"> <br>
-        <span>描述</span> <br>
+        <span class="t" style="margin-left: 16px;">描述</span> <br>
         <input class="Hinput" type="text" v-model="collectionDesc"> <br>
       </div>
     </Modal>
@@ -43,21 +43,19 @@ export default {
     }
   },
   mounted(){
-    var _this = this;
     setTimeout(() => {
-      var userName = _this.$store.state.userName;
+      var userName = this.$store.state.userName;
       if(userName){
         // 获得收藏夹列表
-        _this.getCollectionsList();
+        this.getCollectionsList();
       }
     }, 0);
     this.$root.Bus.$on('getAllcollectionsList', ()=>{
-      _this.getCollectionsList();
+      this.getCollectionsList();
     });
   },
   methods :{
     addCollection(){
-      var _this = this;
       if(this.collectionName == ''||this.collectionDesc == ''){
         alert("请填写完整收藏夹名和描述");
         return false
@@ -65,8 +63,8 @@ export default {
       let userName = this.$store.state.userName;
       this.$ajax.post('/server/addCollection', {
         'userName': userName,
-        'collectionName' : _this.collectionName,
-        'collectionDesc' : _this.collectionDesc,
+        'collectionName' : this.collectionName,
+        'collectionDesc' : this.collectionDesc,
         'cateList' : [
             {
                 cateNum : 0,
@@ -86,34 +84,37 @@ export default {
             }
         ]
       })
-      .then(function (response) {
+      .then((response) => {
         var data = response.data;
         alert(data.msg);
-        _this.collectionName = '';
-        _this.collectionDesc = '';
-        _this.getCollectionsList();
+        this.collectionName = '';
+        this.collectionDesc = '';
+        this.getCollectionsList();
       })
-      .catch(function (error) {
+      .catch((error) => {
         console.log(error);
       });
     },
     getCollectionsList(){
-      var _this = this; 
-      this.$ajax.get('/server/getCollections?userName='+_this.$store.state.userName)
-      .then(function (response) {
+      this.$ajax.get('/server/getCollections?userName='+this.$store.state.userName)
+      .then((response) => {
         let data = response.data;
         let status = data.status;
         if(status == 1){
           let list = data.docs;
-          _this.collectionsList = list;
-          _this.$root.Bus.$emit('showCollectionDetail', {
-            item : list[0],
-            index : 0,
-            collectionName : list[0].collectionName 
-          });
+          this.collectionsList = list;
+          if(this.collectionsList.length == 0){
+            return false
+          }else{
+            this.$root.Bus.$emit('showCollectionDetail', {
+              item : list[0],
+              index : 0,
+              collectionName : list[0].collectionName 
+            });
+          }
         }
       })
-      .catch(function (error) {
+      .catch((error) => {
         console.log(error);
       });
     },
@@ -168,6 +169,12 @@ export default {
         padding-left: 25px;
         
       }
+    }
+  }
+  .collectionModalBox{
+    .t{
+      margin-left: 100px;
+      color: red;
     }
   }
 }

@@ -1,6 +1,6 @@
 <template>
-    <div class="editBox" >
-        <span>修改名称</span> <br>
+    <div class="editBox" @keydown="enterChange($event)">
+        <span >修改名称</span> <br>
         <input class="Hinput" 
             style="width:500px;"
             type="text"
@@ -9,7 +9,7 @@
         <input class="Hinput" 
             style="width:500px;"
             type="text" 
-            v-model="changeDesc"> <br>
+            v-model="changeDesc" > <br>
         <div class="Hbutton" style="width:100px;"
              @click="enterChange">确认修改</div>
         <div class="Hbutton" 
@@ -30,47 +30,62 @@ export default {
         cName :String
     },
     mounted(){
+        let userName = this.$store.state.userName;
+        let cName = this.cName;
+        this.$ajax.get(`/server/getCollectionByName?userName=${userName}&cName=${cName}`)
+        .then((response) => {
+            var data = response.data;
+            this.changeName = data.doc.collectionName;
+            this.changeDesc = data.doc.collectionDesc;
+        })
+        .catch((error) => {
+            console.log(error);
+        });
     },
     methods:{
-
-        enterChange(){
-            let _this = this;
+        enterChange(e){
+            let evnetType = e.type;
+            if(evnetType == "keydown"){
+                let keyCode = e.keyCode;
+                if(keyCode != 13){
+                    return false
+                }
+            }
             if(this.changeName == '' ){
                 alert("收藏夹名不可为空");
                 return false
             }
             this.$ajax.post('/server/upDateCollection', {
-                'userName':_this.$store.state.userName,
-                'oldCollectionName': _this.cName,
-                'newCollectionName': _this.changeName,
-                'newCollectionDesc': _this.changeDesc
+                'userName':this.$store.state.userName,
+                'oldCollectionName': this.cName,
+                'newCollectionName': this.changeName,
+                'newCollectionDesc': this.changeDesc
             })
-            .then(function (response) {
+            .then((response) => {
                 var data = response.data;
                 var status = data.status;
                 if( status == 1 ){
-                    _this.$emit('close');  
-                    _this.$root.Bus.$emit('getAllcollectionsList');
+                    this.$emit('close');  
+                    this.$root.Bus.$emit('getAllcollectionsList');
                 }
             })
-            .catch(function (error) {
+            .catch((error) => {
                 console.log(error);
             });
         },
         deleteColl(){
-            let _this = this;
             let userName = this.$store.state.userName;
             let cName = this.cName;
             this.$ajax.get(`/server/deleteCollection?userName=${userName}&cName=${cName}`)
-            .then(function (response) {
+            .then((response) => {
                 var data = response.data;
                 var status = data.status;
                 if( status == 1 ){
-                    _this.$emit('close');  
-                    _this.$root.Bus.$emit('getAllcollectionsList');
+                    this.$emit('close');  
+                    this.$root.Bus.$emit('getAllcollectionsList');
                 }
             })
-            .catch(function (error) {
+            .catch((error) => {
                 console.log(error);
             });
         }
@@ -78,4 +93,10 @@ export default {
 }
 </script>
 <style lang="scss">
+.editBox{
+    line-height: 50px;
+    .Hbutton{
+        margin: 15px 0;
+    }
+}
 </style>

@@ -23,7 +23,7 @@
         </div>
         <div class="editTopBar" v-show="isitemDetailBar">
           <span @click="showMainCon" class="topleft">返回</span>
-          <span class="topCenterTitle">item详情</span>
+          <span class="topCenterTitle">收藏详情</span>
         </div>
       </div>
       <div class="ConBody">
@@ -37,29 +37,38 @@
               <a href="#">{{cate.cateName}}</a>
             </li>
           </ul>
+
           <!-- <div class="addGroup">添加</div> -->
           <!-- <div class="editGroup">编辑</div> -->
-        </div>
 
+        </div>
         <div class="ConListConatiner clearfix" v-show="isMainCon">
           <ul>
-            <!-- <li class="ConItem addNewItem" @click="showModal"></li> -->
-            <li class="ConItem addNewItem" @click="showAddNewItem"></li>
+
+            <li class="ConItem addNewItem" 
+                @click="showAddNewItem">
+              <span class="itemTitle">添加新收藏</span>
+            </li>
+
             <li class="ConItem" 
                 v-for="(item,index) in showItemList" 
-                @click="openLink(index)">
-              {{item.itemTitle}}
+                @click="openLink(index)"
+                :class="{
+                  'showSet' : index == showSetIndex
+                }"
+                @mouseover="showSet(index)"
+                @mouseout="hideSet(index)">
+              <span class="itemTitle">{{item.itemTitle}}</span>
               <img :src="item.coverPic" alt="" class="coverPicHolder">
-              <span class="setItem"
-                    @click.stop="openItemDetail(index)">设置</span>
+              <span class="setItem" @click.stop="openItemDetail(index)">设置</span>
             </li>
           </ul>
         </div>
-        <editcoll v-show="isEdit" 
+        <editcoll v-if="isEdit" 
                   :cName="collectionName"
                   @close="showMainCon">
         </editcoll>
-        <addNewItem v-show="isAddNewItem" 
+        <addNewItem v-if="isAddNewItem" 
                     :listId="listId"
                     :cateList="cateList"
                     @close="showMainCon">
@@ -106,37 +115,37 @@ export default {
       isMainTopBar : true,
       isEditTopBar : false,
       isAddNewItemBar : false,
-      isitemDetailBar : false
+      isitemDetailBar : false,
+
+      showSetIndex : null
 
     }
   },
   mounted(){
-    let _this = this;
     //测试
     // this.showAddNewItem();
     //左侧切换展现
     this.$root.Bus.$on('showCollectionDetail', (listItem)=>{
-      _this.cateList = listItem.item.cateList;
+      this.cateList = listItem.item.cateList;
       let id = listItem.item.collectionId;
-      _this.listId = id;
-      _this.showItems(id);
-      _this.collectionName = listItem.collectionName;
+      this.listId = id;
+      this.showItems(id);
+      this.collectionName = listItem.collectionName;
     });
   },
   methods : {
     //展现数据
     showItems(id){
-      let _this = this;
 
       this.$ajax.post('/server/getItemList', {
         id : id
       })
-      .then(function (response) {
+      .then((response) => {
         var data = response.data;
-        _this.itemList = data.list;
-        _this.filterItemlist();
+        this.itemList = data.list;
+        this.filterItemlist();
       })
-      .catch(function (error) {
+      .catch((error) => {
         console.log(error);
       });
 
@@ -145,16 +154,17 @@ export default {
       location.href = this.itemList[index].itemURL;
     },
     openItemDetail(index){
+
       let item = this.itemList[index];
       this.itemDetailObj = item;
       this.showItemDetail()
+
     },
     changeCate(index){
       this.nowCate = index;
       this.showItems(this.listId);
     },
     filterItemlist(){
-      let _this = this;
       let cate = this.nowCate;
       this.showItemList = [];
       if(cate == -1){
@@ -163,10 +173,16 @@ export default {
         this.itemList.forEach(item => {
           let type = item.itemType;
           if(type == cate){
-            _this.showItemList.push(item);
+            this.showItemList.push(item);
           }
         });
       }
+    },
+    showSet(index){
+      this.showSetIndex = index;
+    },
+    hideSet(index){
+      this.showSetIndex = null;
     },
     showEditcoll(){
       //main
@@ -321,30 +337,48 @@ export default {
       margin:0 -10px; 
       .ConItem{
         float: left;
-        width: 200px;
+        width: 155px;
         height: 200px;
         margin: 10px;
+        margin-bottom: 40px;
         border: 1px solid #ddd;
         border-radius: 5px;
         cursor: pointer;
         position: relative;
+        .itemTitle{
+          position: absolute;
+          bottom: -35px;
+          text-align: center;
+          width: 100%;
+          line-height: 35px;
+        }
         &.addNewItem{
-          background: #123456;
+          background: #01bdd5;
+          &:hover{
+            background : #01a4b9; 
+          }
         }
         .coverPicHolder{
           position: absolute;
-          width: 145px;
-          height: 166px;
-          right: 45px;
-          bottom: 10px;
+          width: 155px;
+          height: 200px;
+          left: 0px;
+          top: 0px;
         }
-        .setItem{
-          position: absolute;
-          right: 10px;
-          bottom: 10px;
-          color: #000;
-          &:hover{
-            color: red;
+        &.showSet{
+          .setItem{
+            position: absolute;
+            right: 0px;
+            bottom: 0px;
+            color: #fff;
+            width: 100%;
+            line-height: 30px;
+            text-align: center;
+            height: 30px;
+            background: rgba(0,0,0,0.5);
+            &:hover{
+              background: rgba(0,0,0,0.6);
+            }
           }
         }
       }

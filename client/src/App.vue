@@ -20,21 +20,20 @@ export default {
     }
   },
   mounted(){
-    let _this = this;
-    _this.$nextTick(function () {
-      _this.$ajax.get('/server/checkLogin')
-      .then(function (response) {
+    this.$nextTick( () => {
+      this.$ajax.get('/server/checkLogin')
+      .then((response) => {
         let data = response.data;
         let name = data.name;
         let sta = data.status;
         if(sta == 0){
-          _this.islogin = false;
-          _this.userName = '';
-          _this.$store.commit("updateUserInfo","");
+          this.islogin = false;
+          this.userName = '';
+          this.$store.commit("updateUserInfo","");
         }else if(sta == 1){
-          _this.islogin = true;
-          _this.userName = name;
-          _this.$store.commit("updateUserInfo",name);
+          this.islogin = true;
+          this.userName = name;
+          this.$store.commit("updateUserInfo",name);
         }
       })
       .catch(function (error) {
