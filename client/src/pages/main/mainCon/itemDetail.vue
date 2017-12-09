@@ -67,7 +67,6 @@ export default {
     },
     watch : {
         itemDetail(item){
-            console.log(item);
             //手动赋值
             this.itemURL = item.itemURL;
             this.itemDesc = item.itemDesc;

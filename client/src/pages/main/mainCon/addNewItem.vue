@@ -20,13 +20,14 @@
         </div>
 
         <div class="searchResult" v-if="isSearchShow">
-            <ul>
+            <ul v-if="searchRlist.length > 0">
                 <li class="resultItem" 
                     v-for="(item,index) in searchRlist" 
                     @click="chooseItem(index)">
                     {{item.title}}
                 </li>
             </ul>
+            <div v-else>{{tempText}}</div>
         </div>
 
 
@@ -84,7 +85,8 @@ export default {
             itemDesc : '',
             qText : '', //搜索关键字
             searchRlist : [],
-            coverPic : 'static/default.png'
+            coverPic : 'static/default.png',
+            tempText : "未搜索到任何信息"
         }
     },
     props:{
@@ -148,17 +150,19 @@ export default {
             }else if(this.cate == '3'){ //音乐
                 searchUrl = musicSearch + this.qText;
             }
+            this.tempText = "搜索中...";
             this.$ajax.jsonp(searchUrl,(err,data) => {
                 if (err) {
                     console.error(err.message);
                 } else {
                     if(this.cate == '1'){ //电影
                         this.searchRlist = data.subjects;
-                    }else if(_this.cate == '2'){ //书籍
+                    }else if(this.cate == '2'){ //书籍
                         this.searchRlist = data.books;
-                    }else if(_this.cate == '3'){ //音乐
+                    }else if(this.cate == '3'){ //音乐
                         this.searchRlist = data.musics;
                     }
+                    this.tempText = "未搜索到任何信息";
                 }
             })
         },
@@ -186,7 +190,7 @@ export default {
                     }else if(this.cate == '2'){ //书籍
                         this.itemDesc = data.summary; 
                         this.coverPic = item.images.large;
-                    }else if(_this.cate == '3'){ //音乐
+                    }else if(this.cate == '3'){ //音乐
                         this.itemDesc = data.summary; 
                         this.coverPic = item.image;
                     }

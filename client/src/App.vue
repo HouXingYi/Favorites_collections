@@ -1,9 +1,17 @@
 <template>
   <div id="app">
-    <login v-if="!islogin" @logined="handleLogin"></login>
-    <topHeader v-if="islogin" :userName="userName" @logout="handleLogout"></topHeader>
-    <leftBar v-if="islogin"></leftBar>   
-    <mainCon v-if="islogin"></mainCon>
+    <transition name="fade">
+      <login v-if="!islogin" @logined="handleLogin"></login>
+    </transition>
+    <transition name="fade">
+      <topHeader v-if="islogin" :userName="userName" @logout="handleLogout"></topHeader>
+    </transition>
+    <transition name="fade">
+      <leftBar v-if="islogin"></leftBar>   
+    </transition>
+    <transition name="fade">
+      <mainCon v-if="islogin"></mainCon>
+    </transition>
   </div>
 </template>
 <script>

@@ -25,7 +25,6 @@
   </div>
 </template>
 <script>
-import Modal from 'components/modal'
 export default {
   name: 'leftBar',
   data () {
@@ -104,12 +103,15 @@ export default {
           let list = data.docs;
           this.collectionsList = list;
           if(this.collectionsList.length == 0){
-            return false
-          }else{
             this.$root.Bus.$emit('showCollectionDetail', {
-              item : list[0],
-              index : 0,
-              collectionName : list[0].collectionName 
+              item : null
+            });
+          }else{
+            let nowIndex = this.activeIndex;
+            this.$root.Bus.$emit('showCollectionDetail', {
+              item : list[nowIndex],
+              index : nowIndex,
+              collectionName : list[nowIndex].collectionName 
             });
           }
         }
@@ -130,9 +132,6 @@ export default {
         collectionName : collectionsItem.collectionName 
       });
     }
-  },
-  components : {
-    Modal
   }
 }
 </script>

@@ -2,17 +2,33 @@
   <div class="mainContainer">
     <div class="mainBox">
       <div class="ConTopBar">
+
         <div class="mainTopBar" v-show="isMainTopBar">
           <div class="myFavor topleft">
             {{collectionName}}
           </div>
-          <!-- <div class="editAll">
-            <a href="" class="editAllLink">批量编辑网站</a>
-          </div> -->
-          <div class="editCollection" @click="showEditcoll">
+
+          <div class="editAll"  @click="showEditAll">
+            <span class="editAllLink">批量编辑网站</span>
+          </div>
+
+          <div class="editCollection" 
+               @click="showEditcoll" 
+               v-show="!addNewTip">
             设置收藏夹
           </div>
         </div>
+
+        <div class="editTopBar editAllTopBar" v-show="isEditAllShow">
+          <span>已选择<i style="color:#02b875;">0</i>个</span>
+          <label class="checkAllBox" for="checkAll">
+            <input type="checkbox" id="checkAll">
+            <span>全选</span>
+          </label>
+          <span class="Hbutton btn">删除</span>
+          <span class="Hbutton btn" @click="showMainCon" >取消</span>
+        </div>
+
         <div class="editTopBar" v-show="isEditTopBar">
           <span @click="showMainCon" class="topleft">返回</span>
           <span class="topCenterTitle">设置收藏夹</span>
@@ -27,9 +43,9 @@
         </div>
       </div>
       <div class="ConBody">
-
         <div class="groupControlBar" v-show="isMainCon">
-          <ul class="groupList">
+
+          <ul class="groupList" v-show="!addNewTip">
             <li :class="{'curAdr':-1==nowCate}" @click="changeCate(-1)"><a href="#">全部</a></li>
             <li :class="{'curAdr':index==nowCate}" 
                 v-for="(cate,index) in cateList" 
@@ -43,7 +59,8 @@
 
         </div>
         <div class="ConListConatiner clearfix" v-show="isMainCon">
-          <ul>
+          <Spin :showSpin="isShowSpin"></Spin>
+          <ul v-show="!addNewTip">
 
             <li class="ConItem addNewItem" 
                 @click="showAddNewItem">
@@ -61,8 +78,14 @@
               <span class="itemTitle">{{item.itemTitle}}</span>
               <img :src="item.coverPic" alt="" class="coverPicHolder">
               <span class="setItem" @click.stop="openItemDetail(index)">设置</span>
+
+              <div class="itemMask" v-show="isEditAllShow"></div>
+
             </li>
           </ul>
+          <div v-show="addNewTip">
+            请添加收藏夹
+          </div>
         </div>
         <editcoll v-if="isEdit" 
                   :cName="collectionName"
@@ -106,37 +129,117 @@ export default {
       coverPic : '',
       collectionName : '',
       itemDetailObj : {},
-
+      showSetIndex : null,
+      addNewTip : false,
+      isShowSpin : false,
+      //main
       isMainCon : true,
       isEdit : false,
       isAddNewItem : false,
       isitemDetail : false,
-      
-      isMainTopBar : true,
+      //bar
+      isMainTopBar : false,
       isEditTopBar : false,
       isAddNewItemBar : false,
       isitemDetailBar : false,
-
-      showSetIndex : null
-
+      isEditAllShow : true
     }
   },
   mounted(){
-    //测试
-    // this.showAddNewItem();
     //左侧切换展现
     this.$root.Bus.$on('showCollectionDetail', (listItem)=>{
-      this.cateList = listItem.item.cateList;
-      let id = listItem.item.collectionId;
-      this.listId = id;
-      this.showItems(id);
-      this.collectionName = listItem.collectionName;
+      if(listItem.item == null){
+        this.addNewTip = true;
+        return false
+      }else{
+        this.addNewTip = false;
+        this.cateList = listItem.item.cateList;
+        let id = listItem.item.collectionId;
+        this.listId = id;
+        this.showItems(id);
+        this.collectionName = listItem.collectionName;
+      }
     });
   },
+  watch:{
+    //main状态，四个只允许有一个true（展示）
+    isMainCon(val){
+      if(val == true){
+        this.isEdit = false;
+        this.isAddNewItem = false;
+        this.isitemDetail = false;
+      }
+    },
+    isEdit(val){
+      if(val == true){
+        this.isMainCon = false;
+        this.isAddNewItem = false;
+        this.isitemDetail = false;
+      }
+    },
+    isAddNewItem(val){
+      if(val == true){
+        this.isMainCon = false;
+        this.isEdit = false;
+        this.isitemDetail = false;
+      }
+    },
+    isitemDetail(val){
+      if(val == true){
+        this.isMainCon = false;
+        this.isEdit = false;
+        this.isAddNewItem = false;
+      }
+    },
+    //main状态，五个只允许有一个true（展示）
+    isMainTopBar(val){
+      if(val == true){
+        this.isEditTopBar = false;
+        this.isAddNewItemBar = false;
+        this.isitemDetailBar = false;
+        this.isEditAllShow = false;
+      }
+    },
+    isEditTopBar(val){
+      if(val == true){
+        this.isMainTopBar = false;
+        this.isAddNewItemBar = false;
+        this.isitemDetailBar = false;
+        this.isEditAllShow = false;
+      }
+    },
+    isAddNewItemBar(val){
+      if(val == true){
+        this.isMainTopBar = false;
+        this.isEditTopBar = false;
+        this.isitemDetailBar = false;
+        this.isEditAllShow = false;
+      }
+    },
+    isitemDetailBar(val){
+      if(val == true){
+        this.isMainTopBar = false;
+        this.isEditTopBar = false;
+        this.isAddNewItemBar = false;
+        this.isEditAllShow = false;
+      }
+    },
+    isEditAllShow(val){
+      if(val == true){
+        this.isMainTopBar = false;
+        this.isEditTopBar = false;
+        this.isAddNewItemBar = false;
+        this.isitemDetailBar = false;
+      }
+    }
+  },
   methods : {
-    //展现数据
     showItems(id){
-
+      if(this.listId == ''){
+        alert("请选择或新建收藏夹");
+        return false
+      }
+      this.isShowSpin = true;
       this.$ajax.post('/server/getItemList', {
         id : id
       })
@@ -144,21 +247,21 @@ export default {
         var data = response.data;
         this.itemList = data.list;
         this.filterItemlist();
+        this.isShowSpin = false;
       })
       .catch((error) => {
         console.log(error);
       });
-
     },
     openLink(index){
-      location.href = this.itemList[index].itemURL;
+      if(this.isEditAllShow == false){
+        location.href = this.itemList[index].itemURL;
+      }
     },
     openItemDetail(index){
-
       let item = this.itemList[index];
       this.itemDetailObj = item;
       this.showItemDetail()
-
     },
     changeCate(index){
       this.nowCate = index;
@@ -178,59 +281,40 @@ export default {
         });
       }
     },
+    showEditAll(){
+      this.isEditAllShow = true;
+    },
+    showEditcoll(){
+      if(this.listId == ''){
+        alert("请选择或新建收藏夹");
+        return false
+      }
+      this.isEditTopBar = true;
+      this.isEdit = true;
+    },
+    showAddNewItem(){
+      if(this.listId == ''){
+        alert("请选择或新建收藏夹");
+        return false
+      }
+      this.isAddNewItemBar = true;
+      this.isAddNewItem = true;
+    },
+    showMainCon(){
+      this.isMainTopBar = true;
+      this.isMainCon = true;
+    },
+    showItemDetail(){
+      this.isitemDetailBar = true;
+      this.isitemDetail = true;
+    },
     showSet(index){
-      this.showSetIndex = index;
+      if(this.isEditAllShow == false){
+        this.showSetIndex = index;
+      }
     },
     hideSet(index){
       this.showSetIndex = null;
-    },
-    showEditcoll(){
-      //main
-      this.isEdit = true;
-      this.isAddNewItem = false;
-      this.isMainCon = false;
-      this.isitemDetail = false;
-      //bar
-      this.isEditTopBar = true;
-      this.isMainTopBar = false;
-      this.isAddNewItemBar = false;
-      this.isitemDetailBar = false;
-    },
-    showAddNewItem(){
-      //main
-      this.isEdit = false;
-      this.isAddNewItem = true;
-      this.isMainCon = false;
-      this.isitemDetail = false;
-      //bar
-      this.isEditTopBar = false;
-      this.isMainTopBar = false;
-      this.isAddNewItemBar = true;
-      this.isitemDetailBar = false;
-    },
-    showMainCon(){
-      //main
-      this.isEdit = false;
-      this.isAddNewItem = false;
-      this.isMainCon = true;
-      this.isitemDetail = false;
-      //bar
-      this.isEditTopBar = false;
-      this.isMainTopBar = true;
-      this.isAddNewItemBar = false;
-      this.isitemDetailBar = false;
-    },
-    showItemDetail(){
-      //main
-      this.isEdit = false;
-      this.isAddNewItem = false;
-      this.isMainCon = false;
-      this.isitemDetail = true;
-      //bar
-      this.isEditTopBar = false;
-      this.isMainTopBar = false;
-      this.isAddNewItemBar = false;
-      this.isitemDetailBar = true;
     }
   },
   components : {
@@ -248,6 +332,10 @@ export default {
   right: 0;
   bottom: 0;  
   z-index: -1;
+  .mainBox{
+    width: 100%;
+    height: 100%;
+  }
   .ConTopBar{
     height: 50px;
     border-bottom: 1px solid #ddd;
@@ -283,7 +371,8 @@ export default {
         float: left;
         margin-left: 20px;
         margin-top: 7px;
-        a{
+        cursor: pointer;
+        .editAllLink{
           display: inline-block;
           padding: 8px 10px;
           border: 1px solid #ddd;
@@ -295,11 +384,28 @@ export default {
         }
       }
     }
-    .editTopBar{
+    .editTopBar.editAllTopBar{
+      line-height: 50px;
+      box-sizing: border-box;
+      padding-left: 20px;
+      .checkAllBox{
+        margin-left: 20px;
+      }
+      .btn{
+        display: inline-block;
+        height: 30px;
+        line-height: 30px;
+        width: 65px;
+        vertical-align: middle;
+        margin-left: 15px;
+      }
     }
   }
   .ConBody{
     padding: 10px 20px;
+    height: calc(97% - 50px);
+    position: relative;
+    overflow: auto;
     .groupControlBar{
       height: 55px;
       line-height: 55px;
@@ -335,6 +441,7 @@ export default {
     }
     .ConListConatiner{
       margin:0 -10px; 
+      position: relative;
       .ConItem{
         float: left;
         width: 155px;
@@ -345,6 +452,15 @@ export default {
         border-radius: 5px;
         cursor: pointer;
         position: relative;
+        .itemMask{
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 100%;
+          height: 100%;
+          z-index: 100;
+          background: rgba(0, 0, 0, 0.5);
+        }
         .itemTitle{
           position: absolute;
           bottom: -35px;
