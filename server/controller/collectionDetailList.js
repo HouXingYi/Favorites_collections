@@ -151,6 +151,41 @@ class collectionDetailList{
 			})
 		})
 	}
+	deleteItems(req, res, next){ //删除多个
+
+		let ids = req.body.ids;
+		let listId = req.body.listId;
+		
+		collectionListModel.findOne({collectionId:listId},function(err,doc){
+			var list_id = doc._id;
+			collectionDetailListModel
+			.findOne({CollectionsFA : list_id})
+			.populate('CollectionsFA')
+			.exec(function(err,doc){
+				let list = doc.CollectionItems;
+				//逆向循环删除
+				for (let i = list.length - 1; i >= 0; i--) {
+					let id = list[i]._id;
+					ids.forEach( (idItem) => {
+						if( id == idItem){
+							doc.CollectionItems.splice(i,1);
+						}
+					})
+				}
+				doc.save((err,doc) => {
+					if(err){
+						console.log(err);
+					}else{
+						res.send({
+							status : 1,
+							msg : 'success'
+						});
+					}
+				})
+			})
+		})
+
+	}
 }
 
 module.exports = new collectionDetailList()

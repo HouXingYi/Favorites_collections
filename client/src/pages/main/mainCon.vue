@@ -2,33 +2,28 @@
   <div class="mainContainer">
     <div class="mainBox">
       <div class="ConTopBar">
-
         <div class="mainTopBar" v-show="isMainTopBar">
           <div class="myFavor topleft">
             {{collectionName}}
           </div>
-
           <div class="editAll"  @click="showEditAll">
             <span class="editAllLink">批量编辑网站</span>
           </div>
-
           <div class="editCollection" 
                @click="showEditcoll" 
                v-show="!addNewTip">
             设置收藏夹
           </div>
         </div>
-
-        <div class="editTopBar editAllTopBar" v-show="isEditAllShow">
+        <div class="editTopBar editAllTopBar" v-if="isEditAllShow">
           <span>已选择<i style="color:#02b875;">0</i>个</span>
           <label class="checkAllBox" for="checkAll">
-            <input type="checkbox" id="checkAll">
+            <input type="checkbox" id="checkAll" v-model="isCheckAll">
             <span>全选</span>
           </label>
-          <span class="Hbutton btn">删除</span>
+          <span class="Hbutton btn" @click="deletItems">删除</span>
           <span class="Hbutton btn" @click="showMainCon" >取消</span>
         </div>
-
         <div class="editTopBar" v-show="isEditTopBar">
           <span @click="showMainCon" class="topleft">返回</span>
           <span class="topCenterTitle">设置收藏夹</span>
@@ -79,7 +74,12 @@
               <img :src="item.coverPic" alt="" class="coverPicHolder">
               <span class="setItem" @click.stop="openItemDetail(index)">设置</span>
 
-              <div class="itemMask" v-show="isEditAllShow"></div>
+              <div class="itemMask" 
+                   :class="{selected:item.flag}"
+                   v-show="isEditAllShow"
+                   @click.stop="pushItem(item,index)">
+                   <img v-show="item.flag" class="dIcon" src="static/d_icon.png" alt="">
+              </div>
 
             </li>
           </ul>
@@ -114,6 +114,7 @@ export default {
   data () {
     return {
       modalShow : false,
+      isCheckAll : false, 
       modalSize : {
         height : 300,
         width : 500
@@ -138,11 +139,11 @@ export default {
       isAddNewItem : false,
       isitemDetail : false,
       //bar
-      isMainTopBar : false,
+      isMainTopBar : true,
       isEditTopBar : false,
       isAddNewItemBar : false,
       isitemDetailBar : false,
-      isEditAllShow : true
+      isEditAllShow : false
     }
   },
   mounted(){
@@ -162,6 +163,12 @@ export default {
     });
   },
   watch:{
+    isCheckAll(val){
+      this.itemList.forEach((item) => {
+        item.flag = val;
+      })
+      this.filterItemlist();
+    },
     //main状态，四个只允许有一个true（展示）
     isMainCon(val){
       if(val == true){
@@ -234,6 +241,50 @@ export default {
     }
   },
   methods : {
+    pushItem(item,index){
+      var id = item._id;
+      this.itemList.forEach((item) => {
+        if(item._id == id){
+          let flag = item.flag;
+          if(flag == true){
+            item.flag = false;
+          }else{
+            item.flag = true;
+          }
+        }
+      })
+      this.filterItemlist();
+    },
+    getItemIds(){
+      let ids = [];
+      this.itemList.forEach((item,index) => {
+        let flag = item.flag;
+        let id = item._id;
+        if(flag == true){
+          ids.push(id);
+        }
+      });
+      return ids;
+    },
+    deletItems(){
+      let ids = this.getItemIds();
+      let listId = this.listId;
+      this.$ajax.post('/server/deleteItems', {
+        ids ,
+        listId
+      })
+      .then((response) => {
+        let data = response.data;
+        if(data.status == 1){
+          this.showMainCon()
+          this.showItems(listId);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+
+    },
     showItems(id){
       if(this.listId == ''){
         alert("请选择或新建收藏夹");
@@ -246,6 +297,9 @@ export default {
       .then((response) => {
         var data = response.data;
         this.itemList = data.list;
+        this.itemList.forEach((item) => {
+          item.flag = false;
+        });
         this.filterItemlist();
         this.isShowSpin = false;
       })
@@ -460,6 +514,16 @@ export default {
           height: 100%;
           z-index: 100;
           background: rgba(0, 0, 0, 0.5);
+          &.selected{
+            background: rgba(0, 0, 0, 0.8);
+          }
+          .dIcon{
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            margin-left: -32px;
+            margin-top: -32px;
+          }
         }
         .itemTitle{
           position: absolute;
